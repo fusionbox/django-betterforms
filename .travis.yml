@@ -14,8 +14,12 @@ install:
   - python setup.py install
 matrix:
   allow_failures:
-    - env:
-      - DJANGO_PACKAGE=https://github.com/django/django/archive/master.zip
+    - env: DJANGO_PACKAGE=https://github.com/django/django/archive/master.zip
+      python:
+        - "2.7"
+        - "2.6"
+        - "3.2"
+        - "3.3"
     - python:
       - "3.2"
       - "3.3"
