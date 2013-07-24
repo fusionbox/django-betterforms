@@ -192,6 +192,16 @@ class TestBetterForm(TestCase):
             tuple(fieldset.fieldset for fieldset in form.fieldsets),
         )
 
+    def test_no_fieldsets(self):
+        class TestForm(BetterForm):
+            a = forms.CharField()
+            b = forms.CharField()
+            c = forms.CharField()
+
+        form = TestForm()
+        fields = [field.field for field in form]
+        self.assertItemsEqual(fields, form.fields.values())
+
 
 class TestBetterModelForm(TestCase):
     def setUp(self):

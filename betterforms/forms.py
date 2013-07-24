@@ -147,10 +147,12 @@ class FieldsetMixin(NonBraindamagedErrorMixin):
     template_name = None
     fieldset_class = Fieldset
     bound_fieldset_class = BoundFieldset
-    base_fieldsets = tuple()
+    base_fieldsets = None
 
     @property
     def fieldsets(self):
+        if self.base_fieldsets is None:
+            return self.bound_fieldset_class(self, self.fields.keys(), '__base_fieldset__')
         return self.bound_fieldset_class(self, self.base_fieldsets, self.base_fieldsets.name)
 
     def __getitem__(self, key):
@@ -184,8 +186,8 @@ def get_fieldsets(bases, attrs):
         for base in bases:
             fieldsets = getattr(base, 'base_fieldsets', None)
             if fieldsets is not None:
-                return fieldsets or []
-    return []
+                return fieldsets
+    return None
 
 
 def get_fieldset_class(bases, attrs):
@@ -203,7 +205,7 @@ def get_fieldset_class(bases, attrs):
 class BetterModelFormMetaclass(forms.models.ModelFormMetaclass):
     def __new__(cls, name, bases, attrs):
         base_fieldsets = get_fieldsets(bases, attrs)
-        if base_fieldsets:
+        if base_fieldsets is not None:
             FieldsetClass = get_fieldset_class(bases, attrs)
             base_fieldsets = FieldsetClass('__base_fieldset__', fields=base_fieldsets)
             attrs['base_fieldsets'] = base_fieldsets
@@ -221,9 +223,11 @@ class BetterModelForm(FieldsetMixin, CSSClassMixin, forms.ModelForm):
 
 class BetterFormMetaClass(forms.forms.DeclarativeFieldsMetaclass):
     def __new__(cls, name, bases, attrs):
-        FieldsetClass = get_fieldset_class(bases, attrs)
         base_fieldsets = get_fieldsets(bases, attrs)
-        attrs['base_fieldsets'] = FieldsetClass('__base_fieldset__', fields=base_fieldsets)
+        if base_fieldsets is not None:
+            FieldsetClass = get_fieldset_class(bases, attrs)
+            base_fieldsets = FieldsetClass('__base_fieldset__', fields=base_fieldsets)
+        attrs['base_fieldsets'] = base_fieldsets
         return super(BetterFormMetaClass, cls).__new__(cls, name, bases, attrs)
 
 
