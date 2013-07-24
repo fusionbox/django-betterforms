@@ -176,7 +176,12 @@ class FieldsetMixin(NonBraindamagedErrorMixin):
         raise NotImplementedError('To be implemented')
 
     def as_p(self):
-        raise NotImplementedError('To be implemented')
+        env = {
+            'form': self,
+            'fieldset_template_name': 'partials/fieldset_as_p.html',
+            'field_template_name': 'partials/field_as_p.html',
+        }
+        return render_to_string(self.template_name or 'partials/form_as_p.html', env)
 
 
 def get_fieldsets(bases, attrs):

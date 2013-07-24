@@ -1,0 +1,7 @@
+{% extends 'partials/form_as_fieldsets.html' %}
+
+{% block form_body %}
+  {{ form.non_field_errors }}
+  {# Hack to allow recursive template inclusion #}
+  {% include fieldset_template_name with fieldset=form %}
+{% endblock %}
