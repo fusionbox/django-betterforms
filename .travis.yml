@@ -10,4 +10,7 @@ env:
 install:
   - pip install -q $DJANGO_PACKAGE --use-mirrors
   - python setup.py install
+allow_failures:
+  - env:
+    - DJANGO_PACKAGE=https://github.com/django/django/archive/master.zip
 script: make test
