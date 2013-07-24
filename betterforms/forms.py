@@ -64,7 +64,7 @@ class Fieldset(CSSClassMixin):
 
         # Check for duplicate names.
         names = [str(thing) for thing in self.base_fields]
-        duplicates = [x for x, y in Counter(names).items() if y > 2]
+        duplicates = [x for x, y in Counter(names).items() if y > 1]
         if duplicates:
             raise AttributeError('Name Conflict in fieldset `{0}`.  The name(s) `{1}` appear multiple times.'.format(self.name, duplicates))
         for key, value in kwargs.iteritems():
