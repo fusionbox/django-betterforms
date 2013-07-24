@@ -1,4 +1,7 @@
-import unittest
+try:
+    from django.utils import unittest
+except ImportError:
+    import unittest  # NOQA
 
 from django import forms
 from django.db import models
