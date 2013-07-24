@@ -1,4 +1,8 @@
 import collections
+try:
+    from collections import Counter
+except ImportError:
+    from collections_compat import Counter  # NOQA
 
 from django import forms
 from django.forms.util import ErrorList, ErrorDict
@@ -60,7 +64,7 @@ class Fieldset(CSSClassMixin):
 
         # Check for duplicate names.
         names = [str(thing) for thing in self.base_fields]
-        duplicates = [x for x, y in collections.Counter(names).items() if y > 1]
+        duplicates = [x for x, y in Counter(names).items() if y > 2]
         if duplicates:
             raise AttributeError('Name Conflict in fieldset `{0}`.  The name(s) `{1}` appear multiple times.'.format(self.name, duplicates))
         for key, value in kwargs.iteritems():
@@ -171,7 +175,6 @@ class FieldsetMixin(NonBraindamagedErrorMixin):
 
     def as_p(self):
         raise NotImplementedError('To be implemented')
-
 
 
 def get_fieldsets(bases, attrs):
