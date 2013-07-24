@@ -1,0 +1,20 @@
+{% load betterforms_tags %}
+{% if field.is_hidden %}
+  {{ field }}
+{% else %}
+<div class="{{ field.css_classes }} {{ field.html_name }}{% if required %} required{% endif %} formField">
+  {% if not field|is_checkbox %}
+    {{ field.label_tag }}
+  {% endif %}
+
+  {% if field.help_text %}
+    <p class="help_text">{{ field.help_text }}</p>
+  {% endif %}
+
+  {{ field }}
+  {% if field|is_checkbox %}
+    {{ field.label_tag }}
+  {% endif %}
+  {{ field.errors }}
+</div>
+{% endif %}

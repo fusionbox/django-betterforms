@@ -1,0 +1,27 @@
+{% block form_head %}
+  {% if not no_head %}
+    {% csrf_token %}
+    {% if next %}
+      <input type="hidden" name="next" value="{{ next }}">
+    {% endif %}
+    {{ form.media }}
+  {% endif %}
+{% endblock %}
+
+{% block form_body %}
+  {{ form.non_field_errors }}
+  {% if form.fieldsets %}
+    {% with fieldset_template_name="partials/fieldset_as_divs.html" %}
+      {% for fieldset in form.fieldsets %}
+        {# Hack to allow recursive template inclusion #}
+        {% include fieldset_template_name %}
+      {% endfor %}
+    {% endwith %}
+  {% else %}
+    <fieldset>
+    {% for field in form %}
+      {% include "partials/field_as_div.html" %}
+    {% endfor %}
+    </fieldset>
+  {% endif %}
+{% endblock %}
