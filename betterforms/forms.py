@@ -59,7 +59,7 @@ class Fieldset(CSSClassMixin):
         self.base_fields = tuple(process_fieldset_row(fields, type(self), name))
 
         # Check for duplicate names.
-        names = (str(thing) for thing in self.base_fields)
+        names = [str(thing) for thing in self.base_fields]
         duplicates = [x for x, y in collections.Counter(names).items() if y > 1]
         if duplicates:
             raise AttributeError('Name Conflict in fieldset `{0}`.  The name(s) `{1}` appear multiple times.'.format(self.name, duplicates))
@@ -75,16 +75,8 @@ class Fieldset(CSSClassMixin):
     def __unicode__(self):
         return unicode(self.name)
 
-    # These methods need to be implemented to render the fieldsets and fields
-    # in a similar structure as `BaseForm`
-    def as_table(self):
-        raise NotImplementedError('To be implemented')
-
-    def as_ul(self):
-        raise NotImplementedError('To be implemented')
-
-    def as_p(self):
-        raise NotImplementedError('To be implemented')
+    def __str__(self):
+        return self.name
 
     @property
     def fields(self):
@@ -166,10 +158,20 @@ class FieldsetMixin(NonBraindamagedErrorMixin):
     def __iter__(self):
         return iter(self.fieldsets)
 
+    # These methods need to be implemented to render the fieldsets and fields
+    # in a similar structure as `BaseForm`
     def __str__(self):
-        if not self.fieldsets:
-            return super(FieldsetMixin, self).__str__()
-        return '\n'.join(str(fieldset) for fieldset in self.fieldsets)
+        return self.as_table()
+
+    def as_table(self):
+        raise NotImplementedError('To be implemented')
+
+    def as_ul(self):
+        raise NotImplementedError('To be implemented')
+
+    def as_p(self):
+        raise NotImplementedError('To be implemented')
+
 
 
 def get_fieldsets(bases, attrs):
