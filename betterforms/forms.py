@@ -117,10 +117,10 @@ class BoundFieldset(object):
         env = {
             'fieldset': self,
             'form': self.form,
-            'fieldset_template_name': 'partials/fieldset_as_divs.html',
+            'fieldset_template_name': 'partials/fieldset_as_div.html',
         }
         # TODO: don't hardcode the default template name.
-        return render_to_string(self.template_name or 'partials/fieldset_as_divs.html', env)
+        return render_to_string(self.template_name or 'partials/fieldset_as_div.html', env)
 
     def __iter__(self):
         for name in self.rows.keys():

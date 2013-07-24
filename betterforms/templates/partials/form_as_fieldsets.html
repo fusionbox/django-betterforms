@@ -10,18 +10,8 @@
 
 {% block form_body %}
   {{ form.non_field_errors }}
-  {% if form.fieldsets %}
-    {% with fieldset_template_name="partials/fieldset_as_divs.html" %}
-      {% for fieldset in form.fieldsets %}
-        {# Hack to allow recursive template inclusion #}
-        {% include fieldset_template_name %}
-      {% endfor %}
-    {% endwith %}
-  {% else %}
-    <fieldset>
-    {% for field in form %}
-      {% include "partials/field_as_div.html" %}
-    {% endfor %}
-    </fieldset>
-  {% endif %}
+  {# Hack to allow recursive template inclusion #}
+  {% with fieldset_template_name="partials/fieldset_as_div.html" field_template_name="partials/field_as_div.html" %}
+    {% include fieldset_template_name with fieldset=form %}
+  {% endwith %}
 {% endblock %}

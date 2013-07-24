@@ -3,11 +3,11 @@
 {% else %}
   <fieldset class="{{ fieldset.css_classes }}">
     {{ fieldset.errors }}
-    {% for row in fieldset %}
-      {% if row.is_fieldset %}
-        {% include fieldset_template_name with fieldset=row %}
+    {% for thing in fieldset %}
+      {% if thing.is_fieldset %}
+        {% include fieldset_template_name with fieldset=thing %}
       {% else %}
-        {% include "partials/field_as_div.html" with field=row %}
+        {% include field_template_name with field=thing %}
       {% endif %}
     {% endfor %}
   </fieldset>
