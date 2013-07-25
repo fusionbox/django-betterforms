@@ -3,6 +3,7 @@ try:
 except ImportError:
     import unittest  # NOQA
 
+import django
 from django import forms
 from django.db import models
 from django.test import TestCase
@@ -314,6 +315,7 @@ class TestFormRendering(TestCase):
                 )
         self.TestForm = TestForm
 
+    @unittest.skipIf(django.get_version().startswith('1.3'), "Django < 1.4 doesn't have `assertHTMLEqual`")
     def test_include_tag_rendering(self):
         form = self.TestForm()
         env = {
@@ -382,6 +384,7 @@ class TestFormRendering(TestCase):
         form = self.TestForm()
         form.as_ul()
 
+    @unittest.skipIf(django.get_version().startswith('1.3'), "Django < 1.4 doesn't have `assertHTMLEqual`")
     def test_form_as_p(self):
         form = self.TestForm()
         self.assertHTMLEqual(
