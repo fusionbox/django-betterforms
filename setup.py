@@ -16,7 +16,7 @@ install_requires = [
     'Django>=1.3',
 ]
 
-version = (0, 1, 1, 'final')
+version = (0, 1, 2, 'final')
 
 
 def get_version():
