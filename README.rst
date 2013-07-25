@@ -1,7 +1,7 @@
 django-betterforms
 ------------------
 
-.. image:: https://travis-ci.org/fusionbox/django-betterforms.png-
+.. image:: https://travis-ci.org/fusionbox/django-betterforms.png
    :target: http://travis-ci.org/fusionbox/django-betterforms
    :alt: Build Status
 
