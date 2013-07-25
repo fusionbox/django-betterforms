@@ -18,7 +18,7 @@ Forms
 Errors
 ------
 
-Adding errors in ``betterforms`` is easy.
+Adding errors in ``betterforms`` is easy:
 
     >>> form = BlogEntryForm(request.POST)
     >>> form.is_valid()
@@ -133,7 +133,7 @@ This template does the following things.
   in the template context.
 * outputs the form media
 * loops over ``form.fieldsets``.
-  * for each fieldsets, renders the fieldset using the template ``partials/fieldset_as_divs.html``
+  * for each fieldsets, renders the fieldset using the template ``partials/fieldset_as_div.html``
     * for each item in the fieldset, if it is a fieldset, it is rendered using
       the same template, and if it is a field, renders it using the field
       template.

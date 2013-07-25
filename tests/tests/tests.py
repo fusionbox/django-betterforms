@@ -6,6 +6,7 @@ except ImportError:
 from django import forms
 from django.db import models
 from django.test import TestCase
+from django.template.loader import render_to_string
 
 from betterforms.forms import (
     BetterForm, BetterModelForm, Fieldset, BoundFieldset, flatten_to_tuple,
@@ -197,6 +198,21 @@ class TestBetterForm(TestCase):
         self.assertTrue(fieldsets[0].errors)
         self.assertIn(form.fieldsets[0].fieldset.error_css_class, form.fieldsets[0].css_classes)
 
+    def test_fieldset_css_classes(self):
+        class TestForm(BetterForm):
+            a = forms.CharField()
+            b = forms.CharField()
+            c = forms.CharField()
+
+            class Meta:
+                fieldsets = (
+                    ('first', {'fields': ('a', 'b')}),
+                    ('second', {'fields': ('c'), 'css_classes': ['arst', 'tsra']}),
+                )
+        form = TestForm()
+        self.assertIn('arst', form.fieldsets[1].css_classes)
+        self.assertIn('tsra', form.fieldsets[1].css_classes)
+
     def test_fieldset_iteration(self):
         form = self.TestForm()
         self.assertTupleEqual(
@@ -298,6 +314,59 @@ class TestFormRendering(TestCase):
                 )
         self.TestForm = TestForm
 
+    def test_include_tag_rendering(self):
+        form = self.TestForm()
+        env = {
+            'form': form,
+            'no_head': True,
+            'fieldset_template_name': 'partials/fieldset_as_div.html',
+            'field_template_name': 'partials/field_as_div.html',
+        }
+        self.assertHTMLEqual(
+            render_to_string('partials/form_as_fieldsets.html', env),
+            """
+            <fieldset class="formFieldset first">
+                <div class="required a formField">
+                    <label for="id_a">A</label>
+                    <input id="id_a" name="a" type="text" />
+                </div>
+                <div class="required b formField">
+                    <label for="id_b">B</label>
+                    <input id="id_b" name="b" type="text" />
+                </div>
+            </fieldset>
+            <fieldset class="formFieldset second">
+                <div class="required c formField">
+                    <label for="id_c">C</label>
+                    <input id="id_c" name="c" type="text" />
+                </div>
+            </fieldset>
+            """,
+        )
+        form.field_error('a', 'this is an error message')
+        self.assertHTMLEqual(
+            render_to_string('partials/form_as_fieldsets.html', env),
+            """
+            <fieldset class="formFieldset first">
+                <div class="required error a formField">
+                    <label for="id_a">A</label>
+                    <input id="id_a" name="a" type="text" />
+                    <ul class="errorlist"><li>this is an error message</li></ul>
+                </div>
+                <div class="required b formField">
+                    <label for="id_b">B</label>
+                    <input id="id_b" name="b" type="text" />
+                </div>
+            </fieldset>
+            <fieldset class="formFieldset second">
+                <div class="required c formField">
+                    <label for="id_c">C</label>
+                    <input id="id_c" name="c" type="text" />
+                </div>
+            </fieldset>
+            """,
+        )
+
     @unittest.expectedFailure
     def test_form_to_str(self):
         # TODO: how do we test this
@@ -309,11 +378,54 @@ class TestFormRendering(TestCase):
         form.as_table()
 
     @unittest.expectedFailure
-    def test_form_as_table(self):
+    def test_form_as_ul(self):
         form = self.TestForm()
-        form.as_table()
+        form.as_ul()
 
-    @unittest.expectedFailure
     def test_form_as_p(self):
         form = self.TestForm()
-        form.as_p()
+        self.assertHTMLEqual(
+            form.as_p(),
+            """
+            <fieldset class="formFieldset first">
+                <p class="required">
+                    <label for="id_a">A</label>
+                    <input id="id_a" name="a" type="text" />
+                </p>
+                <p class="required">
+                    <label for="id_b">B</label>
+                    <input id="id_b" name="b" type="text" />
+                </p>
+            </fieldset>
+            <fieldset class="formFieldset second">
+                <p class="required">
+                    <label for="id_c">C</label>
+                    <input id="id_c" name="c" type="text" />
+                </p>
+            </fieldset>
+            """,
+        )
+
+        form.field_error('a', 'this is an error')
+        self.assertHTMLEqual(
+            form.as_p(),
+            """
+            <fieldset class="formFieldset first">
+                <p class="required error">
+                    <ul class="errorlist"><li>this is an error</li></ul>
+                    <label for="id_a">A</label>
+                    <input id="id_a" name="a" type="text" />
+                </p>
+                <p class="required">
+                    <label for="id_b">B</label>
+                    <input id="id_b" name="b" type="text" />
+                </p>
+            </fieldset>
+            <fieldset class="formFieldset second">
+                <p class="required">
+                    <label for="id_c">C</label>
+                    <input id="id_c" name="c" type="text" />
+                </p>
+            </fieldset>
+            """,
+        )
