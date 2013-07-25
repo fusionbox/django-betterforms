@@ -165,7 +165,9 @@ class FieldsetMixin(NonBraindamagedErrorMixin):
             return self.fieldsets[key]
 
     def __iter__(self):
-        return iter(self.fieldsets)
+        for fieldset in self.fieldsets:
+            yield fieldset
+        #return iter(self.fieldsets)
 
     # These methods need to be implemented to render the fieldsets and fields
     # in a similar structure as `BaseForm`
