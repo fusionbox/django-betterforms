@@ -29,6 +29,18 @@ Adding errors in ``betterforms`` is easy.
     >>> form.errors
     {'title': ['This title is already taken']}
 
+You can also add global errors:
+
+    >>> form = BlogEntryForm(request.POST)
+    >>> form.form_error('Not accepting new entries at this time')
+    >>> form.is_valid()
+    False
+    >>> form.errors
+    {'__all__': ['Not accepting new entries at this time']}
+
+`form_error` is simply a wrapper around `field_error` that uses the key
+`__all__` for the field name.
+
 Fieldsets
 ---------
 

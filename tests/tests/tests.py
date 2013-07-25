@@ -175,6 +175,15 @@ class TestBetterForm(TestCase):
         form.field_error('a', 'test')
         self.assertFalse(form.is_valid())
 
+    def test_form_error(self):
+        data = {'a': 'a', 'b': 'b', 'c': 'c'}
+        form = self.TestForm(data)
+        self.assertTrue(form.is_valid())
+
+        form.form_error('test')
+        self.assertFalse(form.is_valid())
+        self.assertDictEqual(form.errors, {'__all__': [u'test']})
+
     def test_fieldset_error(self):
         data = {'a': 'a', 'b': 'b', 'c': 'c'}
         form = self.TestForm(data)

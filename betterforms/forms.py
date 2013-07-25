@@ -27,6 +27,9 @@ class NonBraindamagedErrorMixin(object):
         self._errors.setdefault(name, ErrorList())
         self._errors[name].append(error)
 
+    def form_error(self, error):
+        self.field_error('__all__', error)
+
 
 def process_fieldset_row(fields, fieldset_class, base_name):
     for index, row in enumerate(fields):
