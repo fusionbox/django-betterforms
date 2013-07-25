@@ -316,6 +316,57 @@ class TestFormRendering(TestCase):
         self.TestForm = TestForm
 
     @unittest.skipIf(django.get_version().startswith('1.3'), "Django < 1.4 doesn't have `assertHTMLEqual`")
+    def test_non_fieldset_form_rendering(self):
+        class TestForm(BetterForm):
+            a = forms.CharField()
+            b = forms.CharField()
+            c = forms.CharField()
+
+        form = TestForm()
+        env = {
+            'form': form,
+            'no_head': True,
+            'fieldset_template_name': 'partials/fieldset_as_div.html',
+            'field_template_name': 'partials/field_as_div.html',
+        }
+        self.assertHTMLEqual(
+            render_to_string('partials/form_as_fieldsets.html', env),
+            """
+            <div class="required a formField">
+                <label for="id_a">A</label>
+                <input id="id_a" name="a" type="text" />
+            </div>
+            <div class="required b formField">
+                <label for="id_b">B</label>
+                <input id="id_b" name="b" type="text" />
+            </div>
+            <div class="required c formField">
+                <label for="id_c">C</label>
+                <input id="id_c" name="c" type="text" />
+            </div>
+            """,
+        )
+        form.field_error('a', 'this is an error message')
+        self.assertHTMLEqual(
+            render_to_string('partials/form_as_fieldsets.html', env),
+            """
+            <div class="required error a formField">
+                <label for="id_a">A</label>
+                <input id="id_a" name="a" type="text" />
+                <ul class="errorlist"><li>this is an error message</li></ul>
+            </div>
+            <div class="required b formField">
+                <label for="id_b">B</label>
+                <input id="id_b" name="b" type="text" />
+            </div>
+            <div class="required c formField">
+                <label for="id_c">C</label>
+                <input id="id_c" name="c" type="text" />
+            </div>
+            """,
+        )
+
+    @unittest.skipIf(django.get_version().startswith('1.3'), "Django < 1.4 doesn't have `assertHTMLEqual`")
     def test_include_tag_rendering(self):
         form = self.TestForm()
         env = {
