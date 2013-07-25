@@ -13,10 +13,10 @@ def read(fname):
 
 
 install_requires = [
-    'Django>=1.4',
+    'Django>=1.3',
 ]
 
-version = (0, 0, 1, 'alpha')
+version = (0, 1, 0, 'alpha')
 
 
 def get_version():
