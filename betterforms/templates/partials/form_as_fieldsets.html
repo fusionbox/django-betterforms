@@ -13,7 +13,11 @@
   {# Hack to allow recursive template inclusion #}
   {% with fieldset_template_name="partials/fieldset_as_div.html" field_template_name="partials/field_as_div.html" %}
     {% for thing in form %}
-      {% include fieldset_template_name with fieldset=thing %}
+      {% if thing.is_fieldset %}
+        {% include fieldset_template_name with fieldset=thing %}
+      {% else %}
+        {% include field_template_name with field=thing %}
+      {% endif %}
     {% endfor %}
   {% endwith %}
 {% endblock %}
