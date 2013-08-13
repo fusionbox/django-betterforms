@@ -6,3 +6,4 @@ tests/sqlite_database
 tests/.coverage
 tests/htmlcov/
 dist/
+.tox/
