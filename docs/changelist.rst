@@ -134,6 +134,7 @@ functionality that deals with operations on lists of model instances.
 Working With Changelists
 ------------------------
 
+
 .. currentmodule:: betterforms.views
 
 .. class:: BrowseView
