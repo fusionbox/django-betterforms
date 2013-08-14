@@ -131,27 +131,31 @@ class BoundHeader(object):
         self.param = "{0}-sorts".format(form.prefix or '').strip('-')
 
     @property
-    def index(self):
+    def _index(self):
         return self.form.HEADERS.index(self.header)
 
     @property
-    def sort_index(self):
-        return self.index + 1
+    def _sort_index(self):
+        return self._index + 1
+
+    @property
+    def is_active(self):
+        return self._sort_index in map(abs, self.sorts)
 
     @property
     def is_ascending(self):
-        return self.is_active and self.sort_index in self.sorts
+        return self.is_active and self._sort_index in self.sorts
 
     @property
     def is_descending(self):
-        return self.is_active and self.sort_index not in self.sorts
+        return self.is_active and self._sort_index not in self.sorts
 
     @property
     def css_classes(self):
         classes = []
         if self.is_active:
             classes.append('active')
-            if self.sort_index in self.sorts:
+            if self._sort_index in self.sorts:
                 classes.append('ascending')
             else:
                 classes.append('descending')
@@ -159,31 +163,27 @@ class BoundHeader(object):
 
     def get_sorts_with_header(self):
         if not self.sorts:
-            return [self.sort_index]
-        elif abs(self.sorts[0]) == self.sort_index:
+            return [self._sort_index]
+        elif abs(self.sorts[0]) == self._sort_index:
             return [-1 * self.sorts[0]] + self.sorts[1:]
         else:
-            return [self.sort_index] + filter(lambda x: x != self.sort_index, self.sorts)
+            return [self._sort_index] + filter(lambda x: x != self._sort_index, self.sorts)
 
     @property
     def priority(self):
         if self.is_active:
-            return map(abs, self.sorts).index(self.sort_index) + 1
-
-    @property
-    def is_active(self):
-        return self.sort_index in map(abs, self.sorts)
+            return map(abs, self.sorts).index(self._sort_index) + 1
 
     @property
     def querystring(self):
         return construct_querystring(self.form.data, **{self.param: '.'.join(map(str, self.get_sorts_with_header()))})
 
     @property
-    def singular_queryset(self):
-        return construct_querystring(self.form.data, **{self.param: str(self.sort_index)})
+    def singular_querystring(self):
+        return construct_querystring(self.form.data, **{self.param: str(self._sort_index)})
 
     @property
-    def remove_queryset(self):
+    def remove_querystring(self):
         return construct_querystring(self.form.data, **{self.param: '.'.join(map(str, self.get_sorts_with_header()[1:]))})
 
 

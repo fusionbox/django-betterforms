@@ -8,7 +8,7 @@
         ▴
       {% endif %}
       <a href="" data-sort_by="title" data-direction="up"></a>
-      <span class="filterapplied"><span>{{ header.priority }}</span> <a href="?{{ header.remove_queryset }}">x</a></span>
+      <span class="filterapplied"><span>{{ header.priority }}</span> <a href="?{{ header.remove_querystring }}">x</a></span>
     {% endif %}
   {% else %}
     {{ header.label }}
