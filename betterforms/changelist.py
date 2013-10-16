@@ -161,13 +161,16 @@ class BoundHeader(object):
                 classes.append('descending')
         return ' '.join(classes)
 
-    def get_sorts_with_header(self):
-        if not self.sorts:
-            return [self._sort_index]
-        elif abs(self.sorts[0]) == self._sort_index:
+    def add_to_sorts(self):
+        """
+        Compute the sorts that should be used when we're clicked on. If we're
+        currently in the sorts, we'll be set as the first sort [ascending].
+        Unless we're already at the front then we'll be inverted.
+        """
+        if self.sorts and abs(self.sorts[0]) == self._sort_index:
             return [-1 * self.sorts[0]] + self.sorts[1:]
         else:
-            return [self._sort_index] + filter(lambda x: x != self._sort_index, self.sorts)
+            return [self._sort_index] + filter(lambda x: abs(x) != self._sort_index, self.sorts)
 
     @property
     def priority(self):
@@ -176,7 +179,7 @@ class BoundHeader(object):
 
     @property
     def querystring(self):
-        return construct_querystring(self.form.data, **{self.param: '.'.join(map(str, self.get_sorts_with_header()))})
+        return construct_querystring(self.form.data, **{self.param: '.'.join(map(str, self.add_to_sorts()))})
 
     @property
     def singular_querystring(self):
@@ -184,7 +187,7 @@ class BoundHeader(object):
 
     @property
     def remove_querystring(self):
-        return construct_querystring(self.form.data, **{self.param: '.'.join(map(str, self.get_sorts_with_header()[1:]))})
+        return construct_querystring(self.form.data, **{self.param: '.'.join(map(str, self.add_to_sorts()[1:]))})
 
 
 class HeaderSet(ThingSet):
