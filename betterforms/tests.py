@@ -5,10 +5,14 @@ except ImportError:
 
 import django
 from django import forms
+from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.test import TestCase
 from django.template.loader import render_to_string
 
+from betterforms.changelist import (
+    BaseChangeListForm, SearchForm, SortForm,
+)
 from betterforms.forms import (
     BetterForm, BetterModelForm, Fieldset, BoundFieldset, flatten_to_tuple,
 )
@@ -483,3 +487,112 @@ class TestFormRendering(TestCase):
             </fieldset>
             """,
         )
+
+
+class SearchModel(models.Model):
+    field_a = models.CharField(max_length=255)
+    field_b = models.CharField(max_length=255)
+    field_c = models.TextField(max_length=255)
+
+
+class TestChangleListQuerySetAPI(TestCase):
+    def setUp(self):
+        class TheSearchForm(BaseChangeListForm):
+            model = SearchModel
+            foo = forms.CharField()
+        self.TheSearchForm = TheSearchForm
+
+        for i in range(5):
+            SearchModel.objects.create(field_a=str(i))
+
+    def test_with_model_declared(self):
+        form = self.TheSearchForm({})
+
+        # base_queryset should default to Model.objects.all()
+        self.assertTrue(form.base_queryset.count(), 5)
+
+    def test_with_model_declaration_and_provided_queryset(self):
+        form = self.TheSearchForm({'foo': 'arst'}, queryset=SearchModel.objects.exclude(field_a='0').exclude(field_a='1'))
+
+        self.assertTrue(form.base_queryset.count(), 3)
+        self.assertTrue(form.queryset.count(), 3)
+
+    def test_lazy_queryset_attribute_access(self):
+        invalid_form = self.TheSearchForm({})
+
+        self.assertTrue(invalid_form.queryset.count(), 0)
+        self.assertFalse(invalid_form.is_valid())
+
+        valid_form = self.TheSearchForm({'foo': 'arst'})
+
+        self.assertTrue(valid_form.queryset.count(), 5)
+        self.assertTrue(valid_form.is_valid())
+
+    def test_invalid_form_has_empty_queryset(self):
+        invalid_form = self.TheSearchForm({})
+
+        self.assertTrue(invalid_form.base_queryset.count(), 5)
+        self.assertFalse(invalid_form.is_valid())
+        self.assertTrue(invalid_form.queryset.count(), 0)
+
+
+class TestSearchFormAPI(TestCase):
+    def setUp(self):
+        SearchModel.objects.create(field_a='foo', field_b='bar', field_c='baz')
+        SearchModel.objects.create(field_a='bar', field_b='baz')
+        SearchModel.objects.create(field_a='baz')
+
+    def test_requires_search_fields(self):
+        class TheSearchForm(SearchForm):
+            model = SearchModel
+
+        with self.assertRaises(ImproperlyConfigured):
+            TheSearchForm({})
+
+    def test_passing_in_search_fields(self):
+        class TheSearchForm(SearchForm):
+            model = SearchModel
+
+        form = TheSearchForm({}, search_fields=('field_a',))
+        self.assertEqual(form.SEARCH_FIELDS, ('field_a',))
+
+        form = TheSearchForm({}, search_fields=('field_a', 'field_b'))
+        self.assertEqual(form.SEARCH_FIELDS, ('field_a', 'field_b'))
+
+    def test_setting_search_fields_on_class(self):
+        class TheSearchForm(SearchForm):
+            SEARCH_FIELDS = ('field_a', 'field_b', 'field_c')
+            model = SearchModel
+
+        form = TheSearchForm({})
+        self.assertEqual(form.SEARCH_FIELDS, ('field_a', 'field_b', 'field_c'))
+
+    def test_overriding_search_fields_set_on_class(self):
+        class TheSearchForm(SearchForm):
+            SEARCH_FIELDS = ('field_a', 'field_b', 'field_c')
+            model = SearchModel
+
+        form = TheSearchForm({}, search_fields=('field_a', 'field_c'))
+        self.assertEqual(form.SEARCH_FIELDS, ('field_a', 'field_c'))
+
+    def test_searching(self):
+        class TheSearchForm(SearchForm):
+            SEARCH_FIELDS = ('field_a', 'field_b', 'field_c')
+            model = SearchModel
+
+        self.assertEqual(TheSearchForm({'q': 'foo'}).queryset.count(), 1)
+
+        self.assertEqual(TheSearchForm({'q': 'bar'}).queryset.count(), 2)
+
+        self.assertEqual(TheSearchForm({'q': 'baz'}).queryset.count(), 3)
+
+    def test_searching_over_limited_fields(self):
+        class TheSearchForm(SearchForm):
+            SEARCH_FIELDS = ('field_a', 'field_c')
+            model = SearchModel
+
+        self.assertEqual(TheSearchForm({'q': 'foo'}).queryset.count(), 1)
+
+        self.assertEqual(TheSearchForm({'q': 'bar'}).queryset.count(), 1)
+
+        self.assertEqual(TheSearchForm({'q': 'baz'}).queryset.count(), 2)

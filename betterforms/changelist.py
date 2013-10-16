@@ -3,7 +3,7 @@ import urllib
 
 from django import forms
 from django.forms.forms import pretty_name
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, ImproperlyConfigured
 from django.db.models import Q
 from django.utils.datastructures import SortedDict
 
@@ -30,6 +30,8 @@ class BaseChangeListForm(BetterForm):
     """
     Base class for all ``ChangeListForms``.
     """
+    _queryset = None
+
     def __init__(self, *args, **kwargs):
         """
         Takes an option named argument ``queryset`` as the base queryset used in
@@ -53,16 +55,30 @@ class BaseChangeListForm(BetterForm):
         """
         return self.base_queryset
 
+    @property
+    def queryset(self):
+        if self._queryset is None:
+            self.full_clean()
+        return self._queryset
+
     def full_clean(self, *args, **kwargs):
         super(BaseChangeListForm, self).full_clean()
-        if self.is_valid():
-            self.queryset = self.get_queryset()
+        self._queryset = self.get_queryset()
 
 
 class SearchForm(BaseChangeListForm):
-    SEARCH_FIELDS = tuple()
+    SEARCH_FIELDS = None
     CASE_SENSITIVE = False
     q = forms.CharField(label="Search", required=False)
+
+    def __init__(self, *args, **kwargs):
+        self.SEARCH_FIELDS = kwargs.pop('search_fields', self.SEARCH_FIELDS)
+        super(SearchForm, self).__init__(*args, **kwargs)
+
+        if self.SEARCH_FIELDS is None:
+            raise ImproperlyConfigured('`SearchForm`s must be instantiated with an\
+                                       iterable of fields to search over, or have \
+                                       a `SEARCH_FIELDS` attribute set on them.')
 
     def get_queryset(self):
         """
