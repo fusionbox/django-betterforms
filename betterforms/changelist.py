@@ -105,46 +105,43 @@ class SearchForm(BaseChangeListForm):
         return qs
 
 
-class ThingSet(object):
-    ThingClass = None
-
-    def __init__(self, form, headers):
-        if self.ThingClass is None:
-            raise AttributeError('ThingSet must have a ThingClass attribute')
-        self.form = form
-        self.headers = SortedDict()
-        for header in headers:
-            self.headers[header.name] = header
-
-    def __iter__(self):
-        for header in self.headers.values():
-            yield self.ThingClass(self.form, header)
-
-    def __getitem__(self, key):
-        if isinstance(key, int):
-            return self.ThingClass(self.form, self.headers.values()[key])
-        else:
-            return self.ThingClass(self.form, self.headers[key])
-
-
-class Header(object):
-    def __init__(self, name, label=None, column_name=False, is_sortable=True):
-        self.name = name
-        self.label = label or pretty_name(name)
-        self.column_name = column_name or name
-        self.is_sortable = is_sortable
+def is_header_kwargs(header):
+    try:
+        if not len(header) == 2:
+            return False
+    except AttributeError:
+        return False
+    try:
+        return all((
+            isinstance(header[0], basestring),
+            isinstance(header[1], dict),
+        ))
+    except IndexError:
+        return False
 
 
 class BoundHeader(object):
     def __init__(self, form, header):
-        self.name = header.name
-        self.label = header.label
-        self.column_name = header.column_name
-        self.is_sortable = header.is_sortable
         self.form = form
-        self.sorts = getattr(form, 'cleaned_data', {}).get('sorts', [])
         self.header = header
+        self.sorts = getattr(form, 'cleaned_data', {}).get('sorts', [])
         self.param = "{0}-sorts".format(form.prefix or '').strip('-')
+
+    @property
+    def name(self):
+        return self.header.name
+
+    @property
+    def label(self):
+        return self.header.label
+
+    @property
+    def column_name(self):
+        return self.header.column_name
+
+    @property
+    def is_sortable(self):
+        return self.header.is_sortable
 
     @property
     def _index(self):
@@ -152,28 +149,48 @@ class BoundHeader(object):
 
     @property
     def _sort_index(self):
+        """
+        1-indexed value for what number represents this header in the sorts
+        querystring parameter.
+        """
         return self._index + 1
 
     @property
     def is_active(self):
+        """
+        Returns whether this header is currently being used for sorting.
+        """
         return self._sort_index in map(abs, self.sorts)
 
     @property
     def is_ascending(self):
+        """
+        Returns whether this header is currently being used for sorting in
+        ascending order.
+        """
         return self.is_active and self._sort_index in self.sorts
 
     @property
     def is_descending(self):
+        """
+        Returns whether this header is currently being used for sorting in
+        descending order.
+        """
         return self.is_active and self._sort_index not in self.sorts
 
     @property
     def css_classes(self):
+        """
+        String suitable to be used for the `class` attribute for an HTML
+        element.  Denotes whether this header is active in the sorts, and the
+        order in which it is being used.
+        """
         classes = []
         if self.is_active:
             classes.append('active')
-            if self._sort_index in self.sorts:
+            if self.is_ascending:
                 classes.append('ascending')
-            else:
+            elif self.is_descending:
                 classes.append('descending')
         return ' '.join(classes)
 
@@ -199,30 +216,79 @@ class BoundHeader(object):
 
     @property
     def singular_querystring(self):
-        return construct_querystring(self.form.data, **{self.param: str(self._sort_index)})
+        if self.is_active and abs(self.sorts[0]) == self._sort_index:
+            value = -1 * self._sort_index
+        else:
+            value = self._sort_index
+        return construct_querystring(self.form.data, **{self.param: str(value)})
 
     @property
     def remove_querystring(self):
         return construct_querystring(self.form.data, **{self.param: '.'.join(map(str, self.add_to_sorts()[1:]))})
 
 
-class HeaderSet(ThingSet):
-    ThingClass = BoundHeader
+class Header(object):
+    BoundClass = BoundHeader
+    column_name = None
+
+    def __init__(self, name, label=None, column_name=False, is_sortable=True):
+        self.name = name
+        self.label = label or pretty_name(name)
+        if is_sortable:
+            self.column_name = column_name or name
+        self.is_sortable = is_sortable
+
+
+class HeaderSet(object):
+    HeaderClass = Header
+
+    def __init__(self, form, headers):
+        self.form = form
+        self.headers = SortedDict()
+        if headers is None:
+            return
+        for header in headers:
+            if isinstance(header, Header):
+                self.headers[header.name] = header
+            elif isinstance(header, basestring):
+                self.headers[header] = self.HeaderClass(header)
+            elif is_header_kwargs(header):
+                header_name, header_kwargs = header
+                self.headers[header_name] = self.HeaderClass(header_name, **header_kwargs)
+            elif len(header):
+                header_name = header[0]
+                header_args = header[1:]
+                self.headers[header_name] = self.HeaderClass(header_name, *header_args)
+            else:
+                raise ImproperlyConfigured('Unknown format in header declaration: `{0}`'.format(repr(header)))
+        if not len(self) == len(headers):
+            raise ImproperlyConfigured('Header names must be unique')
+
+    def __len__(self):
+        return len(self.headers)
+
+    def __iter__(self):
+        for header in self.headers.values():
+            yield self.HeaderClass.BoundClass(self.form, header)
+
+    def __getitem__(self, key):
+        if isinstance(key, int):
+            return self.HeaderClass.BoundClass(self.form, self.headers.values()[key])
+        else:
+            return self.HeaderClass.BoundClass(self.form, self.headers[key])
 
 
 class SortForm(BaseChangeListForm):
-    Header = Header  # Easy access when defining SortForms
+    HeaderSetClass = HeaderSet
     error_messages = {
         'unknown_header': 'Invalid sort parameter',
         'unsortable_header': 'Invalid sort parameter',
     }
-    HEADERS = tuple()
+    HEADERS = None
     sorts = forms.CharField(required=False, widget=forms.HiddenInput())
 
     def __init__(self, *args, **kwargs):
         super(SortForm, self).__init__(*args, **kwargs)
-        if not len(set(h.name for h in self.HEADERS)) == len(self.HEADERS):
-            raise AttributeError('Duplicate `name` in HEADERS')
         self.headers = HeaderSet(self, self.HEADERS)
 
     def clean_sorts(self):

@@ -3,15 +3,18 @@ try:
 except ImportError:
     import unittest  # NOQA
 
+import mock
+
 import django
 from django import forms
 from django.core.exceptions import ImproperlyConfigured
+from django.conf import settings
 from django.db import models
 from django.test import TestCase
 from django.template.loader import render_to_string
 
 from betterforms.changelist import (
-    BaseChangeListForm, SearchForm, SortForm,
+    BaseChangeListForm, SearchForm, SortForm, HeaderSet, Header, BoundHeader
 )
 from betterforms.forms import (
     BetterForm, BetterModelForm, Fieldset, BoundFieldset, flatten_to_tuple,
@@ -489,7 +492,7 @@ class TestFormRendering(TestCase):
         )
 
 
-class SearchModel(models.Model):
+class ChangeListModel(models.Model):
     field_a = models.CharField(max_length=255)
     field_b = models.CharField(max_length=255)
     field_c = models.TextField(max_length=255)
@@ -498,12 +501,12 @@ class SearchModel(models.Model):
 class TestChangleListQuerySetAPI(TestCase):
     def setUp(self):
         class TheSearchForm(BaseChangeListForm):
-            model = SearchModel
+            model = ChangeListModel
             foo = forms.CharField()
         self.TheSearchForm = TheSearchForm
 
         for i in range(5):
-            SearchModel.objects.create(field_a=str(i))
+            ChangeListModel.objects.create(field_a=str(i))
 
     def test_with_model_declared(self):
         form = self.TheSearchForm({})
@@ -512,7 +515,7 @@ class TestChangleListQuerySetAPI(TestCase):
         self.assertTrue(form.base_queryset.count(), 5)
 
     def test_with_model_declaration_and_provided_queryset(self):
-        form = self.TheSearchForm({'foo': 'arst'}, queryset=SearchModel.objects.exclude(field_a='0').exclude(field_a='1'))
+        form = self.TheSearchForm({'foo': 'arst'}, queryset=ChangeListModel.objects.exclude(field_a='0').exclude(field_a='1'))
 
         self.assertTrue(form.base_queryset.count(), 3)
         self.assertTrue(form.queryset.count(), 3)
@@ -538,20 +541,20 @@ class TestChangleListQuerySetAPI(TestCase):
 
 class TestSearchFormAPI(TestCase):
     def setUp(self):
-        SearchModel.objects.create(field_a='foo', field_b='bar', field_c='baz')
-        SearchModel.objects.create(field_a='bar', field_b='baz')
-        SearchModel.objects.create(field_a='baz')
+        ChangeListModel.objects.create(field_a='foo', field_b='bar', field_c='baz')
+        ChangeListModel.objects.create(field_a='bar', field_b='baz')
+        ChangeListModel.objects.create(field_a='baz')
 
     def test_requires_search_fields(self):
         class TheSearchForm(SearchForm):
-            model = SearchModel
+            model = ChangeListModel
 
         with self.assertRaises(ImproperlyConfigured):
             TheSearchForm({})
 
     def test_passing_in_search_fields(self):
         class TheSearchForm(SearchForm):
-            model = SearchModel
+            model = ChangeListModel
 
         form = TheSearchForm({}, search_fields=('field_a',))
         self.assertEqual(form.SEARCH_FIELDS, ('field_a',))
@@ -562,7 +565,7 @@ class TestSearchFormAPI(TestCase):
     def test_setting_search_fields_on_class(self):
         class TheSearchForm(SearchForm):
             SEARCH_FIELDS = ('field_a', 'field_b', 'field_c')
-            model = SearchModel
+            model = ChangeListModel
 
         form = TheSearchForm({})
         self.assertEqual(form.SEARCH_FIELDS, ('field_a', 'field_b', 'field_c'))
@@ -570,7 +573,7 @@ class TestSearchFormAPI(TestCase):
     def test_overriding_search_fields_set_on_class(self):
         class TheSearchForm(SearchForm):
             SEARCH_FIELDS = ('field_a', 'field_b', 'field_c')
-            model = SearchModel
+            model = ChangeListModel
 
         form = TheSearchForm({}, search_fields=('field_a', 'field_c'))
         self.assertEqual(form.SEARCH_FIELDS, ('field_a', 'field_c'))
@@ -578,7 +581,7 @@ class TestSearchFormAPI(TestCase):
     def test_searching(self):
         class TheSearchForm(SearchForm):
             SEARCH_FIELDS = ('field_a', 'field_b', 'field_c')
-            model = SearchModel
+            model = ChangeListModel
 
         self.assertEqual(TheSearchForm({'q': 'foo'}).queryset.count(), 1)
 
@@ -589,10 +592,412 @@ class TestSearchFormAPI(TestCase):
     def test_searching_over_limited_fields(self):
         class TheSearchForm(SearchForm):
             SEARCH_FIELDS = ('field_a', 'field_c')
-            model = SearchModel
+            model = ChangeListModel
 
         self.assertEqual(TheSearchForm({'q': 'foo'}).queryset.count(), 1)
 
         self.assertEqual(TheSearchForm({'q': 'bar'}).queryset.count(), 1)
 
         self.assertEqual(TheSearchForm({'q': 'baz'}).queryset.count(), 2)
+
+    def test_case_insensitive(self):
+        class TheSearchForm(SearchForm):
+            SEARCH_FIELDS = ('field_a', 'field_c')
+            model = ChangeListModel
+
+        self.assertFalse(TheSearchForm.CASE_SENSITIVE)
+
+        upper_cased = ChangeListModel.objects.create(field_a='TeSt')
+        lower_cased = ChangeListModel.objects.create(field_a='test')
+
+        form = TheSearchForm({'q': 'Test'})
+
+        self.assertIn(upper_cased, form.queryset)
+        self.assertIn(lower_cased, form.queryset)
+
+    @unittest.skipIf(settings.DATABASES['default']['ENGINE'] == 'django.db.backends.sqlite3', 'Case Sensitive __contains queries are not supported on sqlite.')
+    def test_case_sensitive(self):
+        # TODO: make this test run on travis with postgres/mysql to be sure
+        # this functionality actually works.
+        class TheSearchForm(SearchForm):
+            SEARCH_FIELDS = ('field_a', 'field_c')
+            CASE_SENSITIVE = True
+            model = ChangeListModel
+
+        self.assertTrue(TheSearchForm.CASE_SENSITIVE)
+
+        upper_cased = ChangeListModel.objects.create(field_a='TeSt')
+        lower_cased = ChangeListModel.objects.create(field_a='test')
+
+        form = TheSearchForm({'q': 'TeSt'})
+
+        self.assertIn(upper_cased, form.queryset)
+        self.assertNotIn(lower_cased, form.queryset)
+
+
+class TestHeaderAPI(TestCase):
+    def test_header_bare_declaration(self):
+        header = Header('field_a')
+
+        self.assertTrue(header.is_sortable)
+        self.assertEqual(header.name, 'field_a')
+        self.assertEqual(header.column_name, 'field_a')
+        self.assertEqual(header.label, 'Field a')
+
+    def test_header_with_label_declaration(self):
+        header = Header('field_a', 'Test Label')
+
+        self.assertEqual(header.label, 'Test Label')
+
+    def test_header_with_column_declared(self):
+        header = Header('not_a_column', column_name='field_a')
+
+        self.assertEqual(header.name, 'not_a_column')
+        self.assertEqual(header.column_name, 'field_a')
+
+    def test_non_sortable_header(self):
+        header = Header('field_a', is_sortable=False)
+
+        self.assertFalse(header.is_sortable)
+
+
+class TestHeaderSetAPI(TestCase):
+    def test_header_names_must_be_unique(self):
+        HEADERS = (
+            Header('field_a'),
+            Header('field_a'),
+        )
+        with self.assertRaises(ImproperlyConfigured):
+            HeaderSet(None, HEADERS)
+
+    def test_header_set_declared_as_header_classes(self):
+        HEADERS = (
+            Header('field_a'),
+            Header('field_b', 'Test Label'),
+            Header('test_name', 'Test Name', column_name='field_c'),
+            Header('created_at', is_sortable=False),
+        )
+        self.do_header_set_assertions(HEADERS)
+
+    def test_header_set_declared_as_args(self):
+        HEADERS = (
+            ('field_a',),
+            ('field_b', 'Test Label'),
+            ('test_name', 'Test Name', 'field_c'),
+            ('created_at', None, None, False),
+        )
+        self.do_header_set_assertions(HEADERS)
+
+    def test_header_set_declared_as_name_and_kwargs(self):
+        HEADERS = (
+            ('field_a', {}),
+            ('field_b', {'label': 'Test Label'}),
+            ('test_name', {'label': 'Test Name', 'column_name': 'field_c'}),
+            ('created_at', {'is_sortable': False}),
+        )
+        self.do_header_set_assertions(HEADERS)
+
+    def test_header_set_mixed_declaration_styles(self):
+        HEADERS = (
+            'field_a',
+            ('field_b', 'Test Label'),
+            ('test_name', {'label': 'Test Name', 'column_name': 'field_c'}),
+            Header('created_at', is_sortable=False),
+        )
+        self.do_header_set_assertions(HEADERS)
+
+    def do_header_set_assertions(self, HEADERS):
+        header_set = HeaderSet(None, HEADERS)
+
+        self.assertTrue(len(header_set), 4)
+        self.assertSequenceEqual(
+            [header.name for header in header_set.headers.values()],
+            ('field_a', 'field_b', 'test_name', 'created_at'),
+        )
+        self.assertSequenceEqual(
+            [header.label for header in header_set.headers.values()],
+            ('Field a', 'Test Label', 'Test Name', 'Created at'),
+        )
+        self.assertSequenceEqual(
+            [header.column_name for header in header_set.headers.values()],
+            ('field_a', 'field_b', 'field_c', None),
+        )
+        self.assertSequenceEqual(
+            [header.is_sortable for header in header_set.headers.values()],
+            (True, True, True, False),
+        )
+
+    def test_iteration_yields_bound_headers(self):
+        HEADERS = (
+            Header('field_a'),
+            Header('field_b', 'Test Label'),
+            Header('test_name', 'Test Name', column_name='field_c'),
+            Header('created_at', is_sortable=False),
+        )
+        form = mock.NonCallableMagicMock(forms.Form)
+        form.prefix = None
+        header_set = HeaderSet(form, HEADERS)
+
+        self.assertTrue(all((
+            isinstance(header, BoundHeader) for header in header_set
+        )))
+
+    def test_index_and_key_lookups(self):
+        HEADERS = (
+            Header('field_a'),
+            Header('field_b', 'Test Label'),
+            Header('test_name', 'Test Name', column_name='field_c'),
+            Header('created_at', is_sortable=False),
+        )
+        form = mock.NonCallableMagicMock(forms.Form)
+        form.prefix = None
+        header_set = HeaderSet(form, HEADERS)
+
+        self.assertIsInstance(header_set[0], BoundHeader)
+        self.assertEqual(header_set[0].header, HEADERS[0])
+
+        self.assertIsInstance(header_set['field_b'], BoundHeader)
+        self.assertEqual(header_set['field_b'].header, HEADERS[1])
+
+
+class TestBoundHeaderAPI(TestCase):
+    def setUp(self):
+        self.HEADERS = (
+            Header('test_name', 'Test Label', 'column_name', is_sortable=True),
+        )
+        self.form = mock.NonCallableMagicMock(forms.Form)
+        self.form.prefix = None
+        self.form.HEADERS = self.HEADERS
+
+    def test_bound_header_pass_through_properties(self):
+        header_set = HeaderSet(self.form, self.HEADERS)
+
+        self.assertEqual(header_set[0].header, self.HEADERS[0])
+        self.assertEqual(header_set[0].name, self.HEADERS[0].name)
+        self.assertEqual(header_set[0].label, self.HEADERS[0].label)
+        self.assertEqual(header_set[0].column_name, self.HEADERS[0].column_name)
+        self.assertEqual(header_set[0].is_sortable, self.HEADERS[0].is_sortable)
+
+    def test_sort_parameter_no_prefix(self):
+        self.assertIsNone(self.form.prefix)
+        header = HeaderSet(self.form, self.HEADERS)[0]
+
+        self.assertEqual(header.param, 'sorts')
+
+    def test_sort_parameter_with_prefix(self):
+        self.form.prefix = 'test'
+        header = HeaderSet(self.form, self.HEADERS)[0]
+
+        self.assertEqual(header.param, 'test-sorts')
+
+    def test_is_active_property_while_not_active(self):
+        header = HeaderSet(self.form, self.HEADERS)[0]
+
+        self.assertFalse(header.is_active)
+        self.assertFalse(header.is_ascending)
+        self.assertFalse(header.is_descending)
+
+    def test_is_active_property_while_active_and_ascending(self):
+        self.form.data = {'sorts': '1'}
+        self.form.cleaned_data = {'sorts': [1]}
+        header = HeaderSet(self.form, self.HEADERS)[0]
+
+        self.assertTrue(header.is_active)
+        self.assertTrue(header.is_ascending)
+        self.assertFalse(header.is_descending)
+
+    def test_is_active_property_while_active_and_descending(self):
+        self.form.data = {'sorts': '-1'}
+        self.form.cleaned_data = {'sorts': [-1]}
+        header = HeaderSet(self.form, self.HEADERS)[0]
+
+        self.assertTrue(header.is_active)
+        self.assertFalse(header.is_ascending)
+        self.assertTrue(header.is_descending)
+
+    def test_add_to_sorts_with_no_sorts(self):
+        HEADERS = (
+            Header('field_a'),
+            Header('field_b'),
+            Header('field_c'),
+        )
+        self.form.data = {}
+        self.form.cleaned_data = {'sorts': []}
+        self.form.HEADERS = HEADERS
+        header_set = HeaderSet(self.form, HEADERS)
+        self.assertEqual(header_set['field_a'].add_to_sorts(), [1])
+        self.assertEqual(header_set['field_b'].add_to_sorts(), [2])
+        self.assertEqual(header_set['field_c'].add_to_sorts(), [3])
+
+    def test_add_to_sorts_with_active_sorts(self):
+        HEADERS = (
+            Header('field_a'),
+            Header('field_b'),
+            Header('field_c'),
+        )
+        self.form.data = {'sorts': '1.-2'}
+        self.form.cleaned_data = {'sorts': [1, -2]}
+        self.form.HEADERS = HEADERS
+        header_set = HeaderSet(self.form, HEADERS)
+        self.assertEqual(header_set['field_a'].add_to_sorts(), [-1, -2])
+        self.assertEqual(header_set['field_b'].add_to_sorts(), [2, 1])
+        self.assertEqual(header_set['field_c'].add_to_sorts(), [3, 1, -2])
+
+    def test_sort_priority_display(self):
+        HEADERS = (
+            Header('field_a'),
+            Header('field_b'),
+            Header('field_c'),
+        )
+        self.form.data = {'sorts': '-2.1'}
+        self.form.cleaned_data = {'sorts': [-2, 1]}
+        self.form.HEADERS = HEADERS
+        header_set = HeaderSet(self.form, HEADERS)
+        self.assertEqual(header_set['field_a'].priority, 2)
+        self.assertEqual(header_set['field_b'].priority, 1)
+        self.assertEqual(header_set['field_c'].priority, None)
+
+    def test_css_classes(self):
+        HEADERS = (
+            Header('field_a'),
+            Header('field_b'),
+            Header('field_c'),
+        )
+        self.form.data = {'sorts': '1.-2'}
+        self.form.cleaned_data = {'sorts': [1, -2]}
+        self.form.HEADERS = HEADERS
+        header_set = HeaderSet(self.form, HEADERS)
+        self.assertEqual(header_set['field_a'].css_classes, 'active ascending')
+        self.assertEqual(header_set['field_b'].css_classes, 'active descending')
+        self.assertEqual(header_set['field_c'].css_classes, '')
+
+    def test_bound_header_querystring_properties(self):
+        HEADERS = (
+            Header('field_a'),
+            Header('field_b'),
+            Header('field_c'),
+        )
+        self.form.data = {'sorts': '1.-2'}
+        self.form.cleaned_data = {'sorts': [1, -2]}
+        self.form.HEADERS = HEADERS
+        header_set = HeaderSet(self.form, HEADERS)
+
+        self.assertEqual(header_set['field_a'].querystring, 'sorts=-1.-2')
+        self.assertEqual(header_set['field_a'].singular_querystring, 'sorts=-1')
+        self.assertEqual(header_set['field_a'].remove_querystring, 'sorts=-2')
+
+        self.assertEqual(header_set['field_b'].querystring, 'sorts=2.1')
+        self.assertEqual(header_set['field_b'].singular_querystring, 'sorts=2')
+        self.assertEqual(header_set['field_b'].remove_querystring, 'sorts=1')
+
+        self.assertEqual(header_set['field_c'].querystring, 'sorts=3.1.-2')
+        self.assertEqual(header_set['field_c'].singular_querystring, 'sorts=3')
+        self.assertEqual(header_set['field_c'].remove_querystring, 'sorts=1.-2')
+
+
+class TestSortFormAPI(TestCase):
+    def setUp(self):
+        self.abc = ChangeListModel.objects.create(field_a='a', field_b='b', field_c='c')
+        self.cab = ChangeListModel.objects.create(field_a='c', field_b='a', field_c='b')
+        self.bca = ChangeListModel.objects.create(field_a='b', field_b='c', field_c='a')
+
+        class TestSortForm(SortForm):
+            model = ChangeListModel
+            HEADERS = (
+                Header('field_a'),
+                Header('field_b'),
+                Header('named_header', column_name='field_c'),
+                Header('not_sortable', is_sortable=False),
+            )
+        self.TestSortForm = TestSortForm
+
+    def test_valid_with_no_sorts(self):
+        form = self.TestSortForm({})
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.queryset.count(), 3)
+
+    def test_sort_field_cleaning(self):
+        self.assertTrue(self.TestSortForm({'sorts': '1.2.3'}).is_valid())
+        self.assertTrue(self.TestSortForm({'sorts': '2.3.1'}).is_valid())
+        self.assertTrue(self.TestSortForm({'sorts': '3.1.2'}).is_valid())
+
+        # Unsortable Header
+        unsortable = self.TestSortForm({'sorts': '1.2.3.4'})
+        self.assertFalse(unsortable.is_valid())
+        self.assertIn('sorts', unsortable.errors)
+        self.assertIn(self.TestSortForm.error_messages['unsortable_header'], unsortable.errors['sorts'])
+
+        # Unknown Header
+        unknown = self.TestSortForm({'sorts': '1.2.3.5'})
+        self.assertFalse(unknown.is_valid())
+        self.assertIn('sorts', unsortable.errors)
+        self.assertIn(self.TestSortForm.error_messages['unknown_header'], unsortable.errors['sorts'])
+
+        # Invalid Header
+        unknown = self.TestSortForm({'sorts': '1.2.X'})
+        self.assertFalse(unknown.is_valid())
+        self.assertIn('sorts', unsortable.errors)
+        self.assertIn(self.TestSortForm.error_messages['unknown_header'], unsortable.errors['sorts'])
+
+    def test_single_field_sorting(self):
+        self.assertSequenceEqual(
+            self.TestSortForm({'sorts': '1'}).queryset,
+            (self.abc, self.bca, self.cab),
+        )
+
+        self.assertSequenceEqual(
+            self.TestSortForm({'sorts': '-1'}).queryset,
+            (self.cab, self.bca, self.abc),
+        )
+
+        self.assertSequenceEqual(
+            self.TestSortForm({'sorts': '2'}).queryset,
+            (self.cab, self.abc, self.bca),
+        )
+
+        self.assertSequenceEqual(
+            self.TestSortForm({'sorts': '-2'}).queryset,
+            (self.bca, self.abc, self.cab),
+        )
+
+        self.assertSequenceEqual(
+            self.TestSortForm({'sorts': '3'}).queryset,
+            (self.bca, self.cab, self.abc),
+        )
+
+        self.assertSequenceEqual(
+            self.TestSortForm({'sorts': '-3'}).queryset,
+            (self.abc, self.cab, self.bca),
+        )
+
+    def test_multi_field_sorting(self):
+        self.aac = ChangeListModel.objects.create(field_a='a', field_b='a', field_c='c')
+
+        self.assertSequenceEqual(
+            self.TestSortForm({'sorts': '1.2'}).queryset,
+            (self.aac, self.abc, self.bca, self.cab),
+        )
+
+        self.assertSequenceEqual(
+            self.TestSortForm({'sorts': '1.-2'}).queryset,
+            (self.abc, self.aac, self.bca, self.cab),
+        )
+
+    def test_order_by_override(self):
+        self.aac = ChangeListModel.objects.create(field_a='a', field_b='a', field_c='c')
+        self.aab = ChangeListModel.objects.create(field_a='a', field_b='a', field_c='b')
+
+        class OverriddenOrderForm(self.TestSortForm):
+            def get_order_by(self):
+                order_by = super(OverriddenOrderForm, self).get_order_by()
+                return ['field_a'] + order_by
+
+        self.assertSequenceEqual(
+            OverriddenOrderForm({'sorts': '-3.2'}).queryset,
+            (self.aac, self.abc, self.aab, self.bca, self.cab),
+        )
+
+        self.assertSequenceEqual(
+            OverriddenOrderForm({'sorts': '3.2'}).queryset,
+            (self.aab, self.aac, self.abc, self.bca, self.cab),
+        )
