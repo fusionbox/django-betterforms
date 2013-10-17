@@ -12,10 +12,6 @@ def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 
-install_requires = [
-    'Django>=1.3',
-]
-
 version = (0, 1, 0, 'alpha')
 
 
@@ -38,7 +34,12 @@ setup(
     author="Fusionbox",
     author_email='programmers@fusionbox.com',
     packages=[package for package in find_packages() if package.startswith('betterforms')],
-    install_requires=install_requires,
+    install_requires=[
+        'Django>=1.3',
+    ],
+    tests_require=[
+        'mock>=1.0.1',
+    ],
     zip_safe=False,
     include_package_data=True,
 )

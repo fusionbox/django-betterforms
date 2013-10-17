@@ -4,8 +4,8 @@ python:
   - "2.6"
 env:
   - DJANGO_PACKAGE=Django==1.3.7
-  - DJANGO_PACKAGE=Django==1.4.5
-  - DJANGO_PACKAGE=Django==1.5.1
+  - DJANGO_PACKAGE=Django==1.4.8
+  - DJANGO_PACKAGE=Django==1.5.4
 install:
   - pip install -q $DJANGO_PACKAGE --use-mirrors
   - python setup.py install
