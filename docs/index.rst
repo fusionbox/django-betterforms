@@ -10,6 +10,7 @@ Contents:
 
     intro
     basics
+    changelist
     changelog
 
 Development
