@@ -1,0 +1,5 @@
+0.1.3 (released October 17, 2013)
+---------------------------------
+
+  - Add ``betterforms.changelist`` module with form classes that assist in
+    listing, searching and filtering querysets.

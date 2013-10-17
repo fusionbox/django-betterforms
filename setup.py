@@ -11,8 +11,9 @@ App for Django featuring improved form base classes.
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
+STAGE = 'alpha'
 
-version = (0, 1, 0, 'alpha')
+version = (0, 1, 3, STAGE)
 
 
 def get_version():
