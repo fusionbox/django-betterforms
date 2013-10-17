@@ -30,8 +30,6 @@ class BaseChangeListForm(BetterForm):
     """
     Base class for all ``ChangeListForms``.
     """
-    _queryset = None
-
     def __init__(self, *args, **kwargs):
         """
         Takes an option named argument ``queryset`` as the base queryset used in
@@ -54,16 +52,6 @@ class BaseChangeListForm(BetterForm):
         model was defined for the form.
         """
         return self.base_queryset
-
-    @property
-    def queryset(self):
-        if self._queryset is None:
-            self.full_clean()
-        return self._queryset
-
-    def full_clean(self, *args, **kwargs):
-        super(BaseChangeListForm, self).full_clean()
-        self._queryset = self.get_queryset()
 
 
 class SearchForm(BaseChangeListForm):
