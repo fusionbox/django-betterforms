@@ -500,43 +500,50 @@ class ChangeListModel(models.Model):
 
 class TestChangleListQuerySetAPI(TestCase):
     def setUp(self):
-        class TheSearchForm(BaseChangeListForm):
+        class TestChangeListForm(BaseChangeListForm):
             model = ChangeListModel
             foo = forms.CharField()
-        self.TheSearchForm = TheSearchForm
+        self.TestChangeListForm = TestChangeListForm
 
         for i in range(5):
             ChangeListModel.objects.create(field_a=str(i))
 
     def test_with_model_declared(self):
-        form = self.TheSearchForm({})
+        form = self.TestChangeListForm({})
 
         # base_queryset should default to Model.objects.all()
         self.assertTrue(form.base_queryset.count(), 5)
 
     def test_with_model_declaration_and_provided_queryset(self):
-        form = self.TheSearchForm({'foo': 'arst'}, queryset=ChangeListModel.objects.exclude(field_a='0').exclude(field_a='1'))
+        form = self.TestChangeListForm({'foo': 'arst'}, queryset=ChangeListModel.objects.exclude(field_a='0').exclude(field_a='1'))
 
         self.assertTrue(form.base_queryset.count(), 3)
         self.assertTrue(form.queryset.count(), 3)
 
     def test_lazy_queryset_attribute_access(self):
-        invalid_form = self.TheSearchForm({})
+        invalid_form = self.TestChangeListForm({})
 
         self.assertTrue(invalid_form.queryset.count(), 0)
         self.assertFalse(invalid_form.is_valid())
 
-        valid_form = self.TheSearchForm({'foo': 'arst'})
+        valid_form = self.TestChangeListForm({'foo': 'arst'})
 
         self.assertTrue(valid_form.queryset.count(), 5)
         self.assertTrue(valid_form.is_valid())
 
     def test_invalid_form_has_empty_queryset(self):
-        invalid_form = self.TheSearchForm({})
+        invalid_form = self.TestChangeListForm({})
 
         self.assertTrue(invalid_form.base_queryset.count(), 5)
         self.assertFalse(invalid_form.is_valid())
         self.assertTrue(invalid_form.queryset.count(), 0)
+
+    def test_missing_model_and_queryset(self):
+        class TestChangeListForm(BaseChangeListForm):
+            pass
+
+        with self.assertRaises(AttributeError):
+            TestChangeListForm()
 
 
 class TestSearchFormAPI(TestCase):
@@ -602,7 +609,7 @@ class TestSearchFormAPI(TestCase):
 
     def test_case_insensitive(self):
         class TheSearchForm(SearchForm):
-            SEARCH_FIELDS = ('field_a', 'field_c')
+            SEARCH_FIELDS = ('field_a',)
             model = ChangeListModel
 
         self.assertFalse(TheSearchForm.CASE_SENSITIVE)
@@ -705,6 +712,16 @@ class TestHeaderSetAPI(TestCase):
             Header('created_at', is_sortable=False),
         )
         self.do_header_set_assertions(HEADERS)
+
+    def test_bad_header_declaration(self):
+        HEADERS = (
+            {'bad_declaration': 'test'},
+            ('field_b', 'Test Label'),
+            ('test_name', {'label': 'Test Name', 'column_name': 'field_c'}),
+            Header('created_at', is_sortable=False),
+        )
+        with self.assertRaises(ImproperlyConfigured):
+            self.do_header_set_assertions(HEADERS)
 
     def do_header_set_assertions(self, HEADERS):
         header_set = HeaderSet(None, HEADERS)

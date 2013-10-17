@@ -105,21 +105,6 @@ class SearchForm(BaseChangeListForm):
         return qs
 
 
-def is_header_kwargs(header):
-    try:
-        if not len(header) == 2:
-            return False
-    except AttributeError:
-        return False
-    try:
-        return all((
-            isinstance(header[0], basestring),
-            isinstance(header[1], dict),
-        ))
-    except IndexError:
-        return False
-
-
 class BoundHeader(object):
     def __init__(self, form, header):
         self.form = form
@@ -239,6 +224,21 @@ class Header(object):
         self.is_sortable = is_sortable
 
 
+def is_header_kwargs(header):
+    try:
+        if not len(header) == 2:
+            return False
+    except AttributeError:
+        return False
+    try:
+        return all((
+            isinstance(header[0], basestring),
+            isinstance(header[1], dict),
+        ))
+    except (IndexError, KeyError):
+        return False
+
+
 class HeaderSet(object):
     HeaderClass = Header
 
@@ -256,9 +256,12 @@ class HeaderSet(object):
                 header_name, header_kwargs = header
                 self.headers[header_name] = self.HeaderClass(header_name, **header_kwargs)
             elif len(header):
-                header_name = header[0]
-                header_args = header[1:]
-                self.headers[header_name] = self.HeaderClass(header_name, *header_args)
+                try:
+                    header_name = header[0]
+                    header_args = header[1:]
+                    self.headers[header_name] = self.HeaderClass(header_name, *header_args)
+                except KeyError:
+                    raise ImproperlyConfigured('Unknown format in header declaration: `{0}`'.format(repr(header)))
             else:
                 raise ImproperlyConfigured('Unknown format in header declaration: `{0}`'.format(repr(header)))
         if not len(self) == len(headers):
