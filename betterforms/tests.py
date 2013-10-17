@@ -518,25 +518,8 @@ class TestChangleListQuerySetAPI(TestCase):
         form = self.TestChangeListForm({'foo': 'arst'}, queryset=ChangeListModel.objects.exclude(field_a='0').exclude(field_a='1'))
 
         self.assertTrue(form.base_queryset.count(), 3)
-        self.assertTrue(form.queryset.count(), 3)
-
-    def test_lazy_queryset_attribute_access(self):
-        invalid_form = self.TestChangeListForm({})
-
-        self.assertTrue(invalid_form.queryset.count(), 0)
-        self.assertFalse(invalid_form.is_valid())
-
-        valid_form = self.TestChangeListForm({'foo': 'arst'})
-
-        self.assertTrue(valid_form.queryset.count(), 5)
-        self.assertTrue(valid_form.is_valid())
-
-    def test_invalid_form_has_empty_queryset(self):
-        invalid_form = self.TestChangeListForm({})
-
-        self.assertTrue(invalid_form.base_queryset.count(), 5)
-        self.assertFalse(invalid_form.is_valid())
-        self.assertTrue(invalid_form.queryset.count(), 0)
+        form.full_clean()
+        self.assertTrue(form.get_queryset().count(), 3)
 
     def test_missing_model_and_queryset(self):
         class TestChangeListForm(BaseChangeListForm):
@@ -590,22 +573,34 @@ class TestSearchFormAPI(TestCase):
             SEARCH_FIELDS = ('field_a', 'field_b', 'field_c')
             model = ChangeListModel
 
-        self.assertEqual(TheSearchForm({'q': 'foo'}).queryset.count(), 1)
+        f = TheSearchForm({'q': 'foo'})
+        f.full_clean()
+        self.assertEqual(f.get_queryset().count(), 1)
 
-        self.assertEqual(TheSearchForm({'q': 'bar'}).queryset.count(), 2)
+        f = TheSearchForm({'q': 'bar'})
+        f.full_clean()
+        self.assertEqual(f.get_queryset().count(), 2)
 
-        self.assertEqual(TheSearchForm({'q': 'baz'}).queryset.count(), 3)
+        f = TheSearchForm({'q': 'baz'})
+        f.full_clean()
+        self.assertEqual(f.get_queryset().count(), 3)
 
     def test_searching_over_limited_fields(self):
         class TheSearchForm(SearchForm):
             SEARCH_FIELDS = ('field_a', 'field_c')
             model = ChangeListModel
 
-        self.assertEqual(TheSearchForm({'q': 'foo'}).queryset.count(), 1)
+        f = TheSearchForm({'q': 'foo'})
+        f.full_clean()
+        self.assertEqual(f.get_queryset().count(), 1)
 
-        self.assertEqual(TheSearchForm({'q': 'bar'}).queryset.count(), 1)
+        f = TheSearchForm({'q': 'bar'})
+        f.full_clean()
+        self.assertEqual(f.get_queryset().count(), 1)
 
-        self.assertEqual(TheSearchForm({'q': 'baz'}).queryset.count(), 2)
+        f = TheSearchForm({'q': 'baz'})
+        f.full_clean()
+        self.assertEqual(f.get_queryset().count(), 2)
 
     def test_case_insensitive(self):
         class TheSearchForm(SearchForm):
@@ -618,9 +613,10 @@ class TestSearchFormAPI(TestCase):
         lower_cased = ChangeListModel.objects.create(field_a='test')
 
         form = TheSearchForm({'q': 'Test'})
+        form.full_clean()
 
-        self.assertIn(upper_cased, form.queryset)
-        self.assertIn(lower_cased, form.queryset)
+        self.assertIn(upper_cased, form.get_queryset())
+        self.assertIn(lower_cased, form.get_queryset())
 
     @unittest.skipIf(settings.DATABASES['default']['ENGINE'] == 'django.db.backends.sqlite3', 'Case Sensitive __contains queries are not supported on sqlite.')
     def test_case_sensitive(self):
@@ -637,9 +633,10 @@ class TestSearchFormAPI(TestCase):
         lower_cased = ChangeListModel.objects.create(field_a='test')
 
         form = TheSearchForm({'q': 'TeSt'})
+        form.full_clean()
 
-        self.assertIn(upper_cased, form.queryset)
-        self.assertNotIn(lower_cased, form.queryset)
+        self.assertIn(upper_cased, form.get_queryset())
+        self.assertNotIn(lower_cased, form.get_queryset())
 
 
 class TestHeaderAPI(TestCase):
@@ -931,7 +928,7 @@ class TestSortFormAPI(TestCase):
     def test_valid_with_no_sorts(self):
         form = self.TestSortForm({})
         self.assertTrue(form.is_valid())
-        self.assertEqual(form.queryset.count(), 3)
+        self.assertEqual(form.get_queryset().count(), 3)
 
     def test_sort_field_cleaning(self):
         self.assertTrue(self.TestSortForm({'sorts': '1.2.3'}).is_valid())
@@ -957,46 +954,62 @@ class TestSortFormAPI(TestCase):
         self.assertIn(self.TestSortForm.error_messages['unknown_header'], unsortable.errors['sorts'])
 
     def test_single_field_sorting(self):
+        f = self.TestSortForm({'sorts': '1'})
+        f.full_clean()
         self.assertSequenceEqual(
-            self.TestSortForm({'sorts': '1'}).queryset,
+            f.get_queryset(),
             (self.abc, self.bca, self.cab),
         )
 
+        f = self.TestSortForm({'sorts': '-1'})
+        f.full_clean()
         self.assertSequenceEqual(
-            self.TestSortForm({'sorts': '-1'}).queryset,
+            f.get_queryset(),
             (self.cab, self.bca, self.abc),
         )
 
+        f = self.TestSortForm({'sorts': '2'})
+        f.full_clean()
         self.assertSequenceEqual(
-            self.TestSortForm({'sorts': '2'}).queryset,
+            f.get_queryset(),
             (self.cab, self.abc, self.bca),
         )
 
+        f = self.TestSortForm({'sorts': '-2'})
+        f.full_clean()
         self.assertSequenceEqual(
-            self.TestSortForm({'sorts': '-2'}).queryset,
+            f.get_queryset(),
             (self.bca, self.abc, self.cab),
         )
 
+        f = self.TestSortForm({'sorts': '3'})
+        f.full_clean()
         self.assertSequenceEqual(
-            self.TestSortForm({'sorts': '3'}).queryset,
+            f.get_queryset(),
             (self.bca, self.cab, self.abc),
         )
 
+        f = self.TestSortForm({'sorts': '-3'})
+        f.full_clean()
         self.assertSequenceEqual(
-            self.TestSortForm({'sorts': '-3'}).queryset,
+            f.get_queryset(),
             (self.abc, self.cab, self.bca),
         )
 
     def test_multi_field_sorting(self):
         self.aac = ChangeListModel.objects.create(field_a='a', field_b='a', field_c='c')
 
+        f = self.TestSortForm({'sorts': '1.2'})
+        f.full_clean()
         self.assertSequenceEqual(
-            self.TestSortForm({'sorts': '1.2'}).queryset,
+            f.get_queryset(),
             (self.aac, self.abc, self.bca, self.cab),
         )
 
+        f = self.TestSortForm({'sorts': '1.-2'})
+        f.full_clean()
         self.assertSequenceEqual(
-            self.TestSortForm({'sorts': '1.-2'}).queryset,
+            f.get_queryset(),
             (self.abc, self.aac, self.bca, self.cab),
         )
 
@@ -1009,12 +1022,16 @@ class TestSortFormAPI(TestCase):
                 order_by = super(OverriddenOrderForm, self).get_order_by()
                 return ['field_a'] + order_by
 
+        f = OverriddenOrderForm({'sorts': '-3.2'})
+        f.full_clean()
         self.assertSequenceEqual(
-            OverriddenOrderForm({'sorts': '-3.2'}).queryset,
+            f.get_queryset(),
             (self.aac, self.abc, self.aab, self.bca, self.cab),
         )
 
+        f = OverriddenOrderForm({'sorts': '3.2'})
+        f.full_clean()
         self.assertSequenceEqual(
-            OverriddenOrderForm({'sorts': '3.2'}).queryset,
+            f.get_queryset(),
             (self.aab, self.aac, self.abc, self.bca, self.cab),
         )
