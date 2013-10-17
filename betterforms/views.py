@@ -22,7 +22,7 @@ class BrowseView(ListView, FormView):
         form = self.get_form(form_class)
         kwargs['form'] = form
         if form.is_valid():
-            kwargs['object_list'] = form.queryset
+            kwargs['object_list'] = form.get_queryset()
         else:
             kwargs['object_list'] = form.base_queryset.none()
         kwargs = super(BrowseView, self).get_context_data(**kwargs)
