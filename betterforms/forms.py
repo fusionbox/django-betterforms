@@ -87,7 +87,7 @@ class Fieldset(CSSClassMixin):
     def __init__(self, name, fields=[], **kwargs):
         self.name = name
         self.base_fields = tuple(process_fieldset_row(fields, type(self), name))
-
+        self.legend = kwargs.pop("legend", None)
         # Check for duplicate names.
         names = [str(thing) for thing in self.base_fields]
         duplicates = [x for x, y in Counter(names).items() if y > 1]
@@ -167,6 +167,10 @@ class BoundFieldset(object):
         if self.errors:
             css_classes.add(self.fieldset.error_css_class)
         return ' '.join(css_classes)
+
+    @property
+    def legend(self):
+        return self.fieldset.legend
 
 
 class FieldsetMixin(NonBraindamagedErrorMixin):
