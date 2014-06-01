@@ -1,6 +1,8 @@
 {% block form_head %}
   {% if not no_head %}
-    {% csrf_token %}
+    {% if not csrf_exempt %}
+      {% csrf_token %}
+    {% endif %}
     {% if next %}
       <input type="hidden" name="next" value="{{ next }}">
     {% endif %}
