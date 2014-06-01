@@ -139,3 +139,12 @@ This template does the following things.
       template.
   * for each field, renders the field using the template
     ``partials/field_as_div.html``
+
+If you want to output the form without the CSRF token (for example on a GET
+form), you can do so by passing in the csrf_exempt variable.
+
+.. code-block:: html
+
+    <form method="post">
+         {% include 'partials/form_as_fieldsets.html' csrf_exempt=True %}
+    </form>
