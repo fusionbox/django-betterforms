@@ -11,6 +11,7 @@ Contents:
     intro
     basics
     changelist
+    multiform
     changelog
 
 Development
