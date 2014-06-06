@@ -6,6 +6,7 @@ except ImportError:
 
 from django import forms
 from django.forms.util import ErrorDict
+from django.core.exceptions import NON_FIELD_ERRORS
 from django.template.loader import render_to_string
 from django.utils.datastructures import SortedDict
 
@@ -28,7 +29,7 @@ class NonBraindamagedErrorMixin(object):
         self._errors[name].append(error)
 
     def form_error(self, error):
-        self.field_error('__all__', error)
+        self.field_error(NON_FIELD_ERRORS, error)
 
 
 def process_fieldset_row(fields, fieldset_class, base_name):
