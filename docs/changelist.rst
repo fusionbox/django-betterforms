@@ -1,16 +1,16 @@
-Changlist Forms
-===============
+Changelist Forms
+================
 
 .. currentmodule:: betterforms.changelist
 
-**Changlist Forms** are designed to facilitate easy searching and sorting on
+**Changelist Forms** are designed to facilitate easy searching and sorting on
 django models, along with providing a framework for building other
 functionality that deals with operations on lists of model instances.
 
 
 .. class:: ChangeListForm
 
-    Base form class for all **Changlist** forms.
+    Base form class for all **Changelist** forms.
 
     * setting the queryset:
 
