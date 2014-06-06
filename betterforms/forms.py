@@ -5,7 +5,7 @@ except ImportError:
     from collections_compat import Counter  # NOQA
 
 from django import forms
-from django.forms.util import ErrorList, ErrorDict
+from django.forms.util import ErrorDict
 from django.template.loader import render_to_string
 from django.utils.datastructures import SortedDict
 
@@ -24,7 +24,7 @@ class NonBraindamagedErrorMixin(object):
     """
     def field_error(self, name, error):
         self._errors = self._errors or ErrorDict()
-        self._errors.setdefault(name, ErrorList())
+        self._errors.setdefault(name, self.error_class())
         self._errors[name].append(error)
 
     def form_error(self, error):
