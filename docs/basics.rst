@@ -110,6 +110,17 @@ All three of these examples will have *appoximately* the same output.  All of
 these formats can be mixed and matched and nested within each other.  And
 Unlike django-admin, you may nest fieldsets as deep as you would like.
 
+A :class:`Fieldset` can also optionally be declared with a legend kwarg,
+which will then be made available as a property to the associated
+:class:`BoundFieldset`.
+
+  .. code-block:: python
+
+      Fieldset('location', ('address', ('city', 'state', 'zip')), legend='Place of Residence')
+
+Should you choose to render the form using the betterform templates detailed below,
+each fieldset with a legend will be rendered with an added legend tag in the template.
+
 Rendering
 ---------
 
