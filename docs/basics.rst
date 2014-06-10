@@ -61,9 +61,9 @@ formats.
 
   .. code-block:: python
 
-      from betterforms.forms import BaseForm
+      from betterforms.forms import BetterForm
 
-      class RegistrationForm(BaseForm):
+      class RegistrationForm(BetterForm):
           ...
           class Meta:
               fieldsets = (
@@ -78,9 +78,9 @@ formats.
 
   .. code-block:: python
 
-      from betterforms.forms import BaseForm
+      from betterforms.forms import BetterForm
 
-      class RegistrationForm(BaseForm):
+      class RegistrationForm(BetterForm):
           ...
           class Meta:
               fieldsets = (
@@ -95,9 +95,9 @@ formats.
 
   .. code-block:: python
 
-      from betterforms.forms import BaseForm, Fieldset
+      from betterforms.forms import BetterForm, Fieldset
 
-      class RegistrationForm(BaseForm):
+      class RegistrationForm(BetterForm):
           ...
           class Meta:
               fieldsets = (
