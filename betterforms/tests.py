@@ -5,7 +5,6 @@ except ImportError:
 
 import mock
 
-import django
 from django import forms
 from django.core.exceptions import ImproperlyConfigured
 from django.conf import settings
@@ -322,7 +321,6 @@ class TestFormRendering(TestCase):
                 )
         self.TestForm = TestForm
 
-    @unittest.skipIf(django.get_version().startswith('1.3'), "Django < 1.4 doesn't have `assertHTMLEqual`")
     def test_non_fieldset_form_rendering(self):
         class TestForm(BetterForm):
             a = forms.CharField()
@@ -373,7 +371,6 @@ class TestFormRendering(TestCase):
             """,
         )
 
-    @unittest.skipIf(django.get_version().startswith('1.3'), "Django < 1.4 doesn't have `assertHTMLEqual`")
     def test_include_tag_rendering(self):
         form = self.TestForm()
         env = {
@@ -442,7 +439,6 @@ class TestFormRendering(TestCase):
         form = self.TestForm()
         form.as_ul()
 
-    @unittest.skipIf(django.get_version().startswith('1.3'), "Django < 1.4 doesn't have `assertHTMLEqual`")
     def test_form_as_p(self):
         form = self.TestForm()
         self.assertHTMLEqual(

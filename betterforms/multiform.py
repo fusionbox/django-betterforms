@@ -11,10 +11,7 @@ try:
 except ImportError:  # Django < 1.7
     from django.forms.util import ErrorDict, ErrorList  # NOQA
 
-try:
-    from django.utils.encoding import python_2_unicode_compatible
-except ImportError:  # Django < 1.4
-    from betterforms.compat import python_2_unicode_compatible
+from django.utils.encoding import python_2_unicode_compatible
 
 
 @python_2_unicode_compatible
