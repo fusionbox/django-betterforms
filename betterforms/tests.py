@@ -234,8 +234,9 @@ class TestBetterForm(TestCase):
             c = forms.CharField()
 
         form = TestForm()
-        fields = [field.field for field in form]
-        self.assertItemsEqual(fields, form.fields.values())
+        fields_iter = sorted((field.field for field in form), key=id)
+        fields_values = sorted(form.fields.values(), key=id)
+        self.assertSequenceEqual(fields_iter, fields_values)
 
 
 class TestBetterModelForm(TestCase):

@@ -12,6 +12,7 @@ except ImportError:  # Django < 1.7
     from django.forms.util import ErrorDict, ErrorList  # NOQA
 
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils.six.moves import reduce
 
 
 @python_2_unicode_compatible

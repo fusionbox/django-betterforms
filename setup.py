@@ -24,7 +24,7 @@ def get_version():
     elif stage == 'alpha':
         process = subprocess.Popen('git rev-parse HEAD'.split(), stdout=subprocess.PIPE)
         stdout, stderr = process.communicate()
-        return number + '-' + stdout.strip()[:8]
+        return number + '-' + stdout.decode('utf-8').strip()[:8]
 
 setup(
     name='django-betterforms',
@@ -43,4 +43,15 @@ setup(
     ],
     zip_safe=False,
     include_package_data=True,
+    classifiers=[
+        'Development Status :: 4 - Beta',
+        'Framework :: Django',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: BSD License',
+        'Topic :: Internet :: WWW/HTTP',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 2.6',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.3',
+    ],
 )
