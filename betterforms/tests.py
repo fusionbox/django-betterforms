@@ -311,6 +311,10 @@ class TestBetterModelForm(TestCase):
 class TestFormRendering(TestCase):
     def setUp(self):
         class TestForm(BetterForm):
+            # Set the label_suffix to an empty string for consistent results
+            # across Django 1.5 and 1.6.
+            label_suffix = ''
+
             a = forms.CharField()
             b = forms.CharField()
             c = forms.CharField()
@@ -324,6 +328,10 @@ class TestFormRendering(TestCase):
 
     def test_non_fieldset_form_rendering(self):
         class TestForm(BetterForm):
+            # Set the label_suffix to an empty string for consistent results
+            # across Django 1.5 and 1.6.
+            label_suffix = ''
+
             a = forms.CharField()
             b = forms.CharField()
             c = forms.CharField()

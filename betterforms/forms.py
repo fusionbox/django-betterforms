@@ -34,6 +34,25 @@ class NonBraindamagedErrorMixin(object):
         self.field_error(NON_FIELD_ERRORS, error)
 
 
+class LabelSuffixMixin(object):
+    """
+    Form mixin to make it possible to override the label_suffix at class
+    declaration.  Django's built-in Form class only allows you to override the
+    label_suffix at instantiation or by overriding __init__.  A value of None
+    will use the default Django provided suffix (':' in English).  If you wish
+    to have no label_suffix, you can set label_suffix to and empty string.  For
+    example,
+
+        class NoLabelSuffixMixin(LabelSuffixMixin):
+            label_suffix = ''
+    """
+    label_suffix = None
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('label_suffix', self.label_suffix)
+        super(LabelSuffixMixin, self).__init__(*args, **kwargs)
+
+
 def process_fieldset_row(fields, fieldset_class, base_name):
     for index, row in enumerate(fields):
         if not isinstance(row, (six.string_types, Fieldset)):
@@ -230,7 +249,7 @@ class BetterModelFormMetaclass(forms.models.ModelFormMetaclass):
         return super(BetterModelFormMetaclass, cls).__new__(cls, name, bases, attrs)
 
 
-class BetterModelForm(six.with_metaclass(BetterModelFormMetaclass, FieldsetMixin, CSSClassMixin, forms.ModelForm)):
+class BetterModelForm(six.with_metaclass(BetterModelFormMetaclass, FieldsetMixin, LabelSuffixMixin, CSSClassMixin, forms.ModelForm)):
     pass
 
 
@@ -244,7 +263,7 @@ class BetterFormMetaClass(forms.forms.DeclarativeFieldsMetaclass):
         return super(BetterFormMetaClass, cls).__new__(cls, name, bases, attrs)
 
 
-class BetterForm(six.with_metaclass(BetterFormMetaClass, FieldsetMixin, CSSClassMixin, forms.forms.BaseForm)):
+class BetterForm(six.with_metaclass(BetterFormMetaClass, FieldsetMixin, LabelSuffixMixin, CSSClassMixin, forms.forms.BaseForm)):
     """
     A 'Better' base Form class.
     """
