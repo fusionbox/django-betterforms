@@ -13,7 +13,7 @@
 {% block form_body %}
   {{ form.non_field_errors }}
   {# Hack to allow recursive template inclusion #}
-  {% with fieldset_template_name="partials/fieldset_as_div.html" field_template_name="partials/field_as_div.html" %}
+  {% with fieldset_template_name="betterforms/fieldset_as_div.html" field_template_name="betterforms/field_as_div.html" %}
     {% for thing in form %}
       {% if thing.is_fieldset %}
         {% include fieldset_template_name with fieldset=thing %}

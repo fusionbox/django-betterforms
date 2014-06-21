@@ -216,7 +216,7 @@ Working With Changelists
 ------------------------
 
 Outputting sort form headers can be done using a provided template partial
-located at ``partials/sort_form_header.html``
+located at ``betterforms/sort_form_header.html``
 
 .. code-block:: html
 
