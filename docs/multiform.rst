@@ -280,6 +280,11 @@ API Reference
 
     .. attribute:: is_bound
 
+    .. attribute:: cleaned_data
+
+        Returns an OrderedDict of the ``cleaned_data`` for each of the child
+        forms.
+
     .. method:: is_valid
 
     .. method:: non_field_errors

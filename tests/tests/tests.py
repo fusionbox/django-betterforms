@@ -1,3 +1,8 @@
+try:
+    from collections import OrderedDict
+except ImportError:  # Python 2.6, Django < 1.7
+    from django.utils.datastructures import SortedDict as OrderedDict  # NOQA
+
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.views.generic import CreateView
@@ -129,6 +134,22 @@ class MultiFormTest(TestCase):
     def test_prefix(self):
         form = ErrorMultiForm(prefix='foo')
         self.assertEqual(form['errors'].prefix, 'errors__foo')
+
+    def test_cleaned_data(self):
+        form = UserProfileMultiForm({
+            'user-name': 'foo',
+            'profile-name': 'foo',
+        })
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data, OrderedDict([
+            ('user', {
+                'name': 'foo',
+            }),
+            ('profile', {
+                'name': 'foo',
+                'display_name': '',
+            }),
+        ]))
 
 
 class MultiModelFormTest(TestCase):
