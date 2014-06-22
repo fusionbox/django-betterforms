@@ -97,6 +97,13 @@ class MultiForm(object):
     def visible_fields(self):
         return [field for field in self if not field.is_hidden]
 
+    @property
+    def cleaned_data(self):
+        return OrderedDict(
+            (key, form.cleaned_data)
+            for key, form in self.forms.items()
+        )
+
 
 class MultiModelForm(MultiForm):
     """
