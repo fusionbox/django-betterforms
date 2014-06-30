@@ -336,42 +336,83 @@ class TestFormRendering(TestCase):
             'fieldset_template_name': 'partials/fieldset_as_div.html',
             'field_template_name': 'partials/field_as_div.html',
         }
-        self.assertHTMLEqual(
-            render_to_string('partials/form_as_fieldsets.html', env),
-            """
-            <div class="required a formField">
-                <label for="id_a">A</label>
-                <input id="id_a" name="a" type="text" />
-            </div>
-            <div class="required b formField">
-                <label for="id_b">B</label>
-                <input id="id_b" name="b" type="text" />
-            </div>
-            <div class="required c formField">
-                <label for="id_c">C</label>
-                <input id="id_c" name="c" type="text" />
-            </div>
-            """,
-        )
-        form.field_error('a', 'this is an error message')
-        self.assertHTMLEqual(
-            render_to_string('partials/form_as_fieldsets.html', env),
-            """
-            <div class="required error a formField">
-                <label for="id_a">A</label>
-                <input id="id_a" name="a" type="text" />
-                <ul class="errorlist"><li>this is an error message</li></ul>
-            </div>
-            <div class="required b formField">
-                <label for="id_b">B</label>
-                <input id="id_b" name="b" type="text" />
-            </div>
-            <div class="required c formField">
-                <label for="id_c">C</label>
-                <input id="id_c" name="c" type="text" />
-            </div>
-            """,
-        )
+
+        if django.get_version().startswith('1.6'):
+            self.assertHTMLEqual(
+                render_to_string('partials/form_as_fieldsets.html', env),
+                """
+                <div class="required a formField">
+                    <label for="id_a">A:</label>
+                    <input id="id_a" name="a" type="text" />
+                </div>
+                <div class="required b formField">
+                    <label for="id_b">B:</label>
+                    <input id="id_b" name="b" type="text" />
+                </div>
+                <div class="required c formField">
+                    <label for="id_c">C:</label>
+                    <input id="id_c" name="c" type="text" />
+                </div>
+                """,
+            )
+            form.field_error('a', 'this is an error message')
+            self.assertHTMLEqual(
+                render_to_string('partials/form_as_fieldsets.html', env),
+                """
+                <div class="required error a formField">
+                    <label for="id_a">A:</label>
+                    <input id="id_a" name="a" type="text" />
+                    <ul class="errorlist"><li>this is an error message</li></ul>
+                </div>
+                <div class="required b formField">
+                    <label for="id_b">B:</label>
+                    <input id="id_b" name="b" type="text" />
+                </div>
+                <div class="required c formField">
+                    <label for="id_c">C:</label>
+                    <input id="id_c" name="c" type="text" />
+                </div>
+                """,
+            )
+
+        else:
+            self.assertHTMLEqual(
+                render_to_string('partials/form_as_fieldsets.html', env),
+                """
+                <div class="required a formField">
+                    <label for="id_a">A</label>
+                    <input id="id_a" name="a" type="text" />
+                </div>
+                <div class="required b formField">
+                    <label for="id_b">B</label>
+                    <input id="id_b" name="b" type="text" />
+                </div>
+                <div class="required c formField">
+                    <label for="id_c">C</label>
+                    <input id="id_c" name="c" type="text" />
+                </div>
+                """,
+            )
+            form.field_error('a', 'this is an error message')
+            self.assertHTMLEqual(
+                render_to_string('partials/form_as_fieldsets.html', env),
+                """
+                <div class="required error a formField">
+                    <label for="id_a">A</label>
+                    <input id="id_a" name="a" type="text" />
+                    <ul class="errorlist"><li>this is an error message</li></ul>
+                </div>
+                <div class="required b formField">
+                    <label for="id_b">B</label>
+                    <input id="id_b" name="b" type="text" />
+                </div>
+                <div class="required c formField">
+                    <label for="id_c">C</label>
+                    <input id="id_c" name="c" type="text" />
+                </div>
+                """,
+            )
+
 
     @unittest.skipIf(django.get_version().startswith('1.3'), "Django < 1.4 doesn't have `assertHTMLEqual`")
     def test_include_tag_rendering(self):
@@ -382,50 +423,99 @@ class TestFormRendering(TestCase):
             'fieldset_template_name': 'partials/fieldset_as_div.html',
             'field_template_name': 'partials/field_as_div.html',
         }
-        self.assertHTMLEqual(
-            render_to_string('partials/form_as_fieldsets.html', env),
-            """
-            <fieldset class="formFieldset first">
-                <div class="required a formField">
-                    <label for="id_a">A</label>
-                    <input id="id_a" name="a" type="text" />
-                </div>
-                <div class="required b formField">
-                    <label for="id_b">B</label>
-                    <input id="id_b" name="b" type="text" />
-                </div>
-            </fieldset>
-            <fieldset class="formFieldset second">
-                <div class="required c formField">
-                    <label for="id_c">C</label>
-                    <input id="id_c" name="c" type="text" />
-                </div>
-            </fieldset>
-            """,
-        )
-        form.field_error('a', 'this is an error message')
-        self.assertHTMLEqual(
-            render_to_string('partials/form_as_fieldsets.html', env),
-            """
-            <fieldset class="formFieldset first">
-                <div class="required error a formField">
-                    <label for="id_a">A</label>
-                    <input id="id_a" name="a" type="text" />
-                    <ul class="errorlist"><li>this is an error message</li></ul>
-                </div>
-                <div class="required b formField">
-                    <label for="id_b">B</label>
-                    <input id="id_b" name="b" type="text" />
-                </div>
-            </fieldset>
-            <fieldset class="formFieldset second">
-                <div class="required c formField">
-                    <label for="id_c">C</label>
-                    <input id="id_c" name="c" type="text" />
-                </div>
-            </fieldset>
-            """,
-        )
+
+        if django.get_version().startswith('1.6'):
+            self.assertHTMLEqual(
+                render_to_string('partials/form_as_fieldsets.html', env),
+                """
+                <fieldset class="formFieldset first">
+                    <div class="required a formField">
+                        <label for="id_a">A:</label>
+                        <input id="id_a" name="a" type="text" />
+                    </div>
+                    <div class="required b formField">
+                        <label for="id_b">B:</label>
+                        <input id="id_b" name="b" type="text" />
+                    </div>
+                </fieldset>
+                <fieldset class="formFieldset second">
+                    <div class="required c formField">
+                        <label for="id_c">C:</label>
+                        <input id="id_c" name="c" type="text" />
+                    </div>
+                </fieldset>
+                """,
+            )
+            form.field_error('a', 'this is an error message')
+            self.assertHTMLEqual(
+                render_to_string('partials/form_as_fieldsets.html', env),
+                """
+                <fieldset class="formFieldset first">
+                    <div class="required error a formField">
+                        <label for="id_a">A:</label>
+                        <input id="id_a" name="a" type="text" />
+                        <ul class="errorlist"><li>this is an error message</li></ul>
+                    </div>
+                    <div class="required b formField">
+                        <label for="id_b">B:</label>
+                        <input id="id_b" name="b" type="text" />
+                    </div>
+                </fieldset>
+                <fieldset class="formFieldset second">
+                    <div class="required c formField">
+                        <label for="id_c">C:</label>
+                        <input id="id_c" name="c" type="text" />
+                    </div>
+                </fieldset>
+                """,
+            )
+
+        else:
+            self.assertHTMLEqual(
+                render_to_string('partials/form_as_fieldsets.html', env),
+                """
+                <fieldset class="formFieldset first">
+                    <div class="required a formField">
+                        <label for="id_a">A</label>
+                        <input id="id_a" name="a" type="text" />
+                    </div>
+                    <div class="required b formField">
+                        <label for="id_b">B</label>
+                        <input id="id_b" name="b" type="text" />
+                    </div>
+                </fieldset>
+                <fieldset class="formFieldset second">
+                    <div class="required c formField">
+                        <label for="id_c">C</label>
+                        <input id="id_c" name="c" type="text" />
+                    </div>
+                </fieldset>
+                """,
+            )
+            form.field_error('a', 'this is an error message')
+            self.assertHTMLEqual(
+                render_to_string('partials/form_as_fieldsets.html', env),
+                """
+                <fieldset class="formFieldset first">
+                    <div class="required error a formField">
+                        <label for="id_a">A</label>
+                        <input id="id_a" name="a" type="text" />
+                        <ul class="errorlist"><li>this is an error message</li></ul>
+                    </div>
+                    <div class="required b formField">
+                        <label for="id_b">B</label>
+                        <input id="id_b" name="b" type="text" />
+                    </div>
+                </fieldset>
+                <fieldset class="formFieldset second">
+                    <div class="required c formField">
+                        <label for="id_c">C</label>
+                        <input id="id_c" name="c" type="text" />
+                    </div>
+                </fieldset>
+                """,
+            )
+
 
     @unittest.expectedFailure
     def test_form_to_str(self):
@@ -445,51 +535,99 @@ class TestFormRendering(TestCase):
     @unittest.skipIf(django.get_version().startswith('1.3'), "Django < 1.4 doesn't have `assertHTMLEqual`")
     def test_form_as_p(self):
         form = self.TestForm()
-        self.assertHTMLEqual(
-            form.as_p(),
-            """
-            <fieldset class="formFieldset first">
-                <p class="required">
-                    <label for="id_a">A</label>
-                    <input id="id_a" name="a" type="text" />
-                </p>
-                <p class="required">
-                    <label for="id_b">B</label>
-                    <input id="id_b" name="b" type="text" />
-                </p>
-            </fieldset>
-            <fieldset class="formFieldset second">
-                <p class="required">
-                    <label for="id_c">C</label>
-                    <input id="id_c" name="c" type="text" />
-                </p>
-            </fieldset>
-            """,
-        )
+        if django.get_version().startswith('1.6'):
+            self.assertHTMLEqual(
+                form.as_p(),
+                """
+                <fieldset class="formFieldset first">
+                    <p class="required">
+                        <label for="id_a">A:</label>
+                        <input id="id_a" name="a" type="text" />
+                    </p>
+                    <p class="required">
+                        <label for="id_b">B:</label>
+                        <input id="id_b" name="b" type="text" />
+                    </p>
+                </fieldset>
+                <fieldset class="formFieldset second">
+                    <p class="required">
+                        <label for="id_c">C:</label>
+                        <input id="id_c" name="c" type="text" />
+                    </p>
+                </fieldset>
+                """,
+            )
 
-        form.field_error('a', 'this is an error')
-        self.assertHTMLEqual(
-            form.as_p(),
-            """
-            <fieldset class="formFieldset first">
-                <p class="required error">
-                    <ul class="errorlist"><li>this is an error</li></ul>
-                    <label for="id_a">A</label>
-                    <input id="id_a" name="a" type="text" />
-                </p>
-                <p class="required">
-                    <label for="id_b">B</label>
-                    <input id="id_b" name="b" type="text" />
-                </p>
-            </fieldset>
-            <fieldset class="formFieldset second">
-                <p class="required">
-                    <label for="id_c">C</label>
-                    <input id="id_c" name="c" type="text" />
-                </p>
-            </fieldset>
-            """,
-        )
+            form.field_error('a', 'this is an error')
+            self.assertHTMLEqual(
+                form.as_p(),
+                """
+                <fieldset class="formFieldset first">
+                    <p class="required error">
+                        <ul class="errorlist"><li>this is an error</li></ul>
+                        <label for="id_a">A:</label>
+                        <input id="id_a" name="a" type="text" />
+                    </p>
+                    <p class="required">
+                        <label for="id_b">B:</label>
+                        <input id="id_b" name="b" type="text" />
+                    </p>
+                </fieldset>
+                <fieldset class="formFieldset second">
+                    <p class="required">
+                        <label for="id_c">C:</label>
+                        <input id="id_c" name="c" type="text" />
+                    </p>
+                </fieldset>
+                """,
+            )
+        else:
+            self.assertHTMLEqual(
+                form.as_p(),
+                """
+                <fieldset class="formFieldset first">
+                    <p class="required">
+                        <label for="id_a">A</label>
+                        <input id="id_a" name="a" type="text" />
+                    </p>
+                    <p class="required">
+                        <label for="id_b">B</label>
+                        <input id="id_b" name="b" type="text" />
+                    </p>
+                </fieldset>
+                <fieldset class="formFieldset second">
+                    <p class="required">
+                        <label for="id_c">C</label>
+                        <input id="id_c" name="c" type="text" />
+                    </p>
+                </fieldset>
+                """,
+            )
+
+            form.field_error('a', 'this is an error')
+            self.assertHTMLEqual(
+                form.as_p(),
+                """
+                <fieldset class="formFieldset first">
+                    <p class="required error">
+                        <ul class="errorlist"><li>this is an error</li></ul>
+                        <label for="id_a">A</label>
+                        <input id="id_a" name="a" type="text" />
+                    </p>
+                    <p class="required">
+                        <label for="id_b">B</label>
+                        <input id="id_b" name="b" type="text" />
+                    </p>
+                </fieldset>
+                <fieldset class="formFieldset second">
+                    <p class="required">
+                        <label for="id_c">C</label>
+                        <input id="id_c" name="c" type="text" />
+                    </p>
+                </fieldset>
+                """,
+            )
+
 
 
 class ChangeListModel(models.Model):
