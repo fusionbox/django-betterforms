@@ -1,11 +1,13 @@
 import copy
-import urllib
 
 from django import forms
 from django.forms.forms import pretty_name
 from django.core.exceptions import ValidationError, ImproperlyConfigured
 from django.db.models import Q
 from django.utils.datastructures import SortedDict
+from django.utils import six
+from django.utils.six.moves import reduce
+from django.utils.http import urlencode
 
 from .forms import BetterForm
 
@@ -13,7 +15,7 @@ from .forms import BetterForm
 def construct_querystring(data, **kwargs):
     params = copy.copy(data)
     params.update(kwargs)
-    return urllib.urlencode(params)
+    return urlencode(params)
 
 
 class IterDict(SortedDict):
@@ -176,12 +178,12 @@ class BoundHeader(object):
         if self.sorts and abs(self.sorts[0]) == self._sort_index:
             return [-1 * self.sorts[0]] + self.sorts[1:]
         else:
-            return [self._sort_index] + filter(lambda x: abs(x) != self._sort_index, self.sorts)
+            return [self._sort_index] + list(filter(lambda x: abs(x) != self._sort_index, self.sorts))
 
     @property
     def priority(self):
         if self.is_active:
-            return map(abs, self.sorts).index(self._sort_index) + 1
+            return list(map(abs, self.sorts)).index(self._sort_index) + 1
 
     @property
     def querystring(self):
@@ -220,7 +222,7 @@ def is_header_kwargs(header):
         return False
     try:
         return all((
-            isinstance(header[0], basestring),
+            isinstance(header[0], six.string_types),
             isinstance(header[1], dict),
         ))
     except (IndexError, KeyError):
@@ -238,7 +240,7 @@ class HeaderSet(object):
         for header in headers:
             if isinstance(header, Header):
                 self.headers[header.name] = header
-            elif isinstance(header, basestring):
+            elif isinstance(header, six.string_types):
                 self.headers[header] = self.HeaderClass(header)
             elif is_header_kwargs(header):
                 header_name, header_kwargs = header
@@ -264,7 +266,7 @@ class HeaderSet(object):
 
     def __getitem__(self, key):
         if isinstance(key, int):
-            return self.HeaderClass.BoundClass(self.form, self.headers.values()[key])
+            return self.HeaderClass.BoundClass(self.form, list(self.headers.values())[key])
         else:
             return self.HeaderClass.BoundClass(self.form, self.headers[key])
 
@@ -284,7 +286,7 @@ class SortForm(BaseChangeListForm):
 
     def clean_sorts(self):
         cleaned_data = self.cleaned_data
-        sorts = filter(bool, cleaned_data.get('sorts', '').split('.'))
+        sorts = list(filter(bool, cleaned_data.get('sorts', '').split('.')))
         if not sorts:
             return []
         # Ensure that the sort parameter does not contain non-numeric sort indexes

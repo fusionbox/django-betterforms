@@ -9,6 +9,8 @@ from django.forms.util import ErrorDict
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.template.loader import render_to_string
 from django.utils.datastructures import SortedDict
+from django.utils import six
+from django.utils.encoding import python_2_unicode_compatible
 
 
 class CSSClassMixin(object):
@@ -32,10 +34,29 @@ class NonBraindamagedErrorMixin(object):
         self.field_error(NON_FIELD_ERRORS, error)
 
 
+class LabelSuffixMixin(object):
+    """
+    Form mixin to make it possible to override the label_suffix at class
+    declaration.  Django's built-in Form class only allows you to override the
+    label_suffix at instantiation or by overriding __init__.  A value of None
+    will use the default Django provided suffix (':' in English).  If you wish
+    to have no label_suffix, you can set label_suffix to and empty string.  For
+    example,
+
+        class NoLabelSuffixMixin(LabelSuffixMixin):
+            label_suffix = ''
+    """
+    label_suffix = None
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('label_suffix', self.label_suffix)
+        super(LabelSuffixMixin, self).__init__(*args, **kwargs)
+
+
 def process_fieldset_row(fields, fieldset_class, base_name):
     for index, row in enumerate(fields):
-        if not isinstance(row, (basestring, Fieldset)):
-            if len(row) == 2 and isinstance(row[0], basestring) and isinstance(row[1], dict):
+        if not isinstance(row, (six.string_types, Fieldset)):
+            if len(row) == 2 and isinstance(row[0], six.string_types) and isinstance(row[1], dict):
                 row = fieldset_class(row[0], **row[1])
             else:
                 row = fieldset_class("{0}_{1}".format(base_name, index), fields=row)
@@ -48,7 +69,7 @@ def flatten(elements):
     iterable of strings.
     """
     for element in elements:
-        if isinstance(element, collections.Iterable) and not isinstance(element, basestring):
+        if isinstance(element, collections.Iterable) and not isinstance(element, six.string_types):
             for sub_element in flatten(element):
                 yield sub_element
         else:
@@ -57,6 +78,7 @@ def flatten(elements):
 flatten_to_tuple = lambda x: tuple(flatten(x))
 
 
+@python_2_unicode_compatible
 class Fieldset(CSSClassMixin):
     FIELDSET_CSS_CLASS = 'formFieldset'
     css_classes = None
@@ -71,17 +93,17 @@ class Fieldset(CSSClassMixin):
         duplicates = [x for x, y in Counter(names).items() if y > 1]
         if duplicates:
             raise AttributeError('Name Conflict in fieldset `{0}`.  The name(s) `{1}` appear multiple times.'.format(self.name, duplicates))
-        for key, value in kwargs.iteritems():
+        for key, value in six.iteritems(kwargs):
             setattr(self, key, value)
 
     def __iter__(self):
         return iter(self.base_fields)
 
-    def __nonzero__(self):
+    def __bool__(self):
         return bool(self.base_fields)
 
-    def __unicode__(self):
-        return unicode(self.name)
+    # Python 2
+    __nonzero__ = __bool__
 
     def __str__(self):
         return self.name
@@ -100,7 +122,7 @@ class BoundFieldset(object):
         self.fieldset = fieldset
         self.rows = SortedDict()
         for row in fieldset:
-            self.rows[unicode(row)] = row
+            self.rows[six.text_type(row)] = row
 
     def __getitem__(self, key):
         """
@@ -112,7 +134,7 @@ class BoundFieldset(object):
         if isinstance(key, int) and not key in self.rows:
             return self[self.rows.keyOrder[key]]
         value = self.rows[key]
-        if isinstance(value, basestring):
+        if isinstance(value, six.string_types):
             return self.form[value]
         else:
             return type(self)(self.form, value, key)
@@ -227,8 +249,7 @@ class BetterModelFormMetaclass(forms.models.ModelFormMetaclass):
         return super(BetterModelFormMetaclass, cls).__new__(cls, name, bases, attrs)
 
 
-class BetterModelForm(FieldsetMixin, CSSClassMixin, forms.ModelForm):
-    __metaclass__ = BetterModelFormMetaclass
+class BetterModelForm(six.with_metaclass(BetterModelFormMetaclass, FieldsetMixin, LabelSuffixMixin, CSSClassMixin, forms.ModelForm)):
     pass
 
 
@@ -242,9 +263,7 @@ class BetterFormMetaClass(forms.forms.DeclarativeFieldsMetaclass):
         return super(BetterFormMetaClass, cls).__new__(cls, name, bases, attrs)
 
 
-class BetterForm(FieldsetMixin, CSSClassMixin, forms.forms.BaseForm):
+class BetterForm(six.with_metaclass(BetterFormMetaClass, FieldsetMixin, LabelSuffixMixin, CSSClassMixin, forms.forms.BaseForm)):
     """
     A 'Better' base Form class.
     """
-    __metaclass__ = BetterFormMetaClass
-    pass
