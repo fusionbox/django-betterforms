@@ -143,10 +143,10 @@ class BoundFieldset(object):
         env = {
             'fieldset': self,
             'form': self.form,
-            'fieldset_template_name': 'partials/fieldset_as_div.html',
+            'fieldset_template_name': 'betterforms/fieldset_as_div.html',
         }
         # TODO: don't hardcode the default template name.
-        return render_to_string(self.template_name or 'partials/fieldset_as_div.html', env)
+        return render_to_string(self.template_name or 'betterforms/fieldset_as_div.html', env)
 
     def __iter__(self):
         for name in self.rows.keys():
@@ -210,10 +210,10 @@ class FieldsetMixin(NonBraindamagedErrorMixin):
     def as_p(self):
         env = {
             'form': self,
-            'fieldset_template_name': 'partials/fieldset_as_p.html',
-            'field_template_name': 'partials/field_as_p.html',
+            'fieldset_template_name': 'betterforms/fieldset_as_p.html',
+            'field_template_name': 'betterforms/field_as_p.html',
         }
-        return render_to_string(self.template_name or 'partials/form_as_p.html', env)
+        return render_to_string(self.template_name or 'betterforms/form_as_p.html', env)
 
 
 def get_fieldsets(bases, attrs):

@@ -42,7 +42,7 @@ And then in your template.
 .. code-block:: html
 
     <form method="post">
-         {% include 'partials/form_as_fieldsets.html' %}
+         {% include 'betterforms/form_as_fieldsets.html' %}
     </form>
 
 Which will render the following.

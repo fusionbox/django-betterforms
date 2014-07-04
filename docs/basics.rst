@@ -133,7 +133,7 @@ partial.
 .. code-block:: html
 
     <form method="post">
-         {% include 'partials/form_as_fieldsets.html' %}
+         {% include 'betterforms/form_as_fieldsets.html' %}
     </form>
 
 This partial assumes there is a variable ``form`` available in its context.
@@ -144,12 +144,15 @@ This template does the following things.
   in the template context.
 * outputs the form media
 * loops over ``form.fieldsets``.
-  * for each fieldsets, renders the fieldset using the template ``partials/fieldset_as_div.html``
-    * for each item in the fieldset, if it is a fieldset, it is rendered using
-      the same template, and if it is a field, renders it using the field
-      template.
-  * for each field, renders the field using the template
-    ``partials/field_as_div.html``
+    * for each fieldsets, renders the fieldset using the template
+      ``betterforms/fieldset_as_div.html``
+
+       * for each item in the fieldset, if it is a fieldset, it is rendered using
+         the same template, and if it is a field, renders it using the field
+         template.
+
+    * for each field, renders the field using the template
+      ``betterforms/field_as_div.html``
 
 If you want to output the form without the CSRF token (for example on a GET
 form), you can do so by passing in the csrf_exempt variable.
@@ -157,5 +160,5 @@ form), you can do so by passing in the csrf_exempt variable.
 .. code-block:: html
 
     <form method="post">
-         {% include 'partials/form_as_fieldsets.html' csrf_exempt=True %}
+         {% include 'betterforms/form_as_fieldsets.html' csrf_exempt=True %}
     </form>

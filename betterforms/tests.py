@@ -340,11 +340,11 @@ class TestFormRendering(TestCase):
         env = {
             'form': form,
             'no_head': True,
-            'fieldset_template_name': 'partials/fieldset_as_div.html',
-            'field_template_name': 'partials/field_as_div.html',
+            'fieldset_template_name': 'betterforms/fieldset_as_div.html',
+            'field_template_name': 'betterforms/field_as_div.html',
         }
         self.assertHTMLEqual(
-            render_to_string('partials/form_as_fieldsets.html', env),
+            render_to_string('betterforms/form_as_fieldsets.html', env),
             """
             <div class="required a formField">
                 <label for="id_a">A</label>
@@ -362,7 +362,7 @@ class TestFormRendering(TestCase):
         )
         form.field_error('a', 'this is an error message')
         self.assertHTMLEqual(
-            render_to_string('partials/form_as_fieldsets.html', env),
+            render_to_string('betterforms/form_as_fieldsets.html', env),
             """
             <div class="required error a formField">
                 <label for="id_a">A</label>
@@ -385,11 +385,11 @@ class TestFormRendering(TestCase):
         env = {
             'form': form,
             'no_head': True,
-            'fieldset_template_name': 'partials/fieldset_as_div.html',
-            'field_template_name': 'partials/field_as_div.html',
+            'fieldset_template_name': 'betterforms/fieldset_as_div.html',
+            'field_template_name': 'betterforms/field_as_div.html',
         }
         self.assertHTMLEqual(
-            render_to_string('partials/form_as_fieldsets.html', env),
+            render_to_string('betterforms/form_as_fieldsets.html', env),
             """
             <fieldset class="formFieldset first">
                 <div class="required a formField">
@@ -411,7 +411,7 @@ class TestFormRendering(TestCase):
         )
         form.field_error('a', 'this is an error message')
         self.assertHTMLEqual(
-            render_to_string('partials/form_as_fieldsets.html', env),
+            render_to_string('betterforms/form_as_fieldsets.html', env),
             """
             <fieldset class="formFieldset first">
                 <div class="required error a formField">
