@@ -124,11 +124,7 @@ each fieldset with a legend will be rendered with an added legend tag in the tem
 Rendering
 ---------
 
-Rendering in ``betterforms`` is currently in flux but will attempt to remain
-*mostly* inline with the established standard created by django forms.
-
-Currently, the proper way to render a form is to use the provided template
-partial.
+To render a form, use the provided template partial.
 
 .. code-block:: html
 
