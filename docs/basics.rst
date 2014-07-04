@@ -162,3 +162,22 @@ form), you can do so by passing in the csrf_exempt variable.
     <form method="post">
          {% include 'betterforms/form_as_fieldsets.html' csrf_exempt=True %}
     </form>
+
+If you wish to override the label suffix, ``django-betterforms`` provides a
+convenient class attribute on the :class:`BetterForm` and
+:class:`BetterModelForm` classes. ::
+
+
+    class MyForm(forms.BetterForm):
+        # ... fields
+
+        label_suffix = '->'
+
+.. warning::
+
+    Due to a bug in dealing with the label suffix in Django < 1.6, the
+    ``label_suffix`` will not appear in any forms rendered using the
+    betterforms templates.  For more information, refer to the `Django bug
+    #18134`_.
+
+.. _Django bug #18134: https://code.djangoproject.com/ticket/18134
