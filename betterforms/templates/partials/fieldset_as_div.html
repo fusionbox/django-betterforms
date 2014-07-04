@@ -2,6 +2,9 @@
   {% include fieldset.template_name %}
 {% else %}
   <fieldset class="{{ fieldset.css_classes }}">
+    {% if fieldset.legend %}
+    <legend>{{ fieldset.legend }}</legend>
+    {% endif %}
     {{ fieldset.errors }}
     {% for thing in fieldset %}
       {% if thing.is_fieldset %}

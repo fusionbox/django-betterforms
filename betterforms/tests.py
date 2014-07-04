@@ -496,6 +496,45 @@ class TestFormRendering(TestCase):
             """,
         )
 
+    def test_fieldset_legend(self):
+        class TestForm(BetterForm):
+            a = forms.CharField()
+            b = forms.CharField()
+            c = forms.CharField()
+
+            label_suffix = ''
+
+            class Meta:
+                fieldsets = (
+                    Fieldset('first', ('a', 'b'), legend='First Fieldset'),
+                    Fieldset('second', ('c'), legend='Second Fieldset'),
+                )
+
+        form = TestForm()
+        self.assertHTMLEqual(
+            form.as_p(),
+            """
+            <fieldset class="formFieldset first">
+                <legend>First Fieldset</legend>
+                <p class="required">
+                    <label for="id_a">A</label>
+                    <input id="id_a" name="a" type="text" />
+                </p>
+                <p class="required">
+                    <label for="id_b">B</label>
+                    <input id="id_b" name="b" type="text" />
+                </p>
+            </fieldset>
+            <fieldset class="formFieldset second">
+                <legend>Second Fieldset</legend>
+                <p class="required">
+                    <label for="id_c">C</label>
+                    <input id="id_c" name="c" type="text" />
+                </p>
+            </fieldset>
+            """,
+        )
+
 
 class ChangeListModel(models.Model):
     field_a = models.CharField(max_length=255)
