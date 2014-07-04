@@ -1,3 +1,21 @@
+1.0.0 (2014-07-04)
+------------------
+
+Backwards-incompatible changes:
+
+  - Moved all the partials to live the betterforms directory
+  - Dropped support for Django 1.3
+
+New Features and Bugfixes:
+
+  - Support Python 3
+  - Support Django 1.6
+  - Add MultiForm and MultiModelForm
+  - Make NonBraindamagedErrorMixin use error_class
+  - Use NON_FIELD_ERRORS constant instead of hardcoded value
+  - Add csrf_exempt argument for form_as_fieldsets
+  - Add legend attribute to Fieldset
+
 0.1.3 (2013-10-17)
 ------------------
 
