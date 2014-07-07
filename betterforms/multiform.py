@@ -26,7 +26,9 @@ class MultiForm(object):
     form_classes = {}
 
     def __init__(self, *args, **kwargs):
-        self.initials = kwargs.pop('initial', {})
+        self.initials = kwargs.pop('initial', None)
+        if self.initials is None:
+            self.initials = {}
         self.forms = OrderedDict()
 
         for key, form_class in self.form_classes.items():
