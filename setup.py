@@ -13,7 +13,7 @@ def read(fname):
 
 STAGE = 'final'
 
-version = (1, 0, 0, STAGE)
+version = (1, 0, 1, STAGE)
 
 
 def get_version():
