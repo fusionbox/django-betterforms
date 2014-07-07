@@ -151,6 +151,10 @@ class MultiFormTest(TestCase):
             }),
         ]))
 
+    def test_handles_none_initial_value(self):
+        # Used to throw an AttributeError
+        UserProfileMultiForm(initial=None)
+
 
 class MultiModelFormTest(TestCase):
     def test_save(self):
