@@ -5,6 +5,7 @@ python:
 env:
   - DJANGO_PACKAGE=https://github.com/django/django/archive/stable/1.5.x.zip
   - DJANGO_PACKAGE=https://github.com/django/django/archive/stable/1.6.x.zip
+  - DJANGO_PACKAGE=https://github.com/django/django/archive/stable/1.7.x.zip
 matrix:
   include:
     - python: "2.6"
