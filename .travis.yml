@@ -15,4 +15,5 @@ matrix:
 install:
   - pip install -q $DJANGO_PACKAGE --use-mirrors
   - python setup.py install
+  - pip install mock
 script: make test
