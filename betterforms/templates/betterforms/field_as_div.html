@@ -2,7 +2,7 @@
 {% if field.is_hidden %}
   {{ field }}
 {% else %}
-<div class="{{ field.css_classes }} {{ field.html_name }}{% if field.field.required %} required{% endif %} formField">
+<div class="{% if field.css_classes %}{{ field.css_classes }} {% endif %}{{ field.html_name }} formField">
   {% if not field|is_checkbox %}
     {{ field.label_tag }}
   {% endif %}
