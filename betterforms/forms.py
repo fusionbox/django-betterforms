@@ -17,7 +17,7 @@ try:
 except ImportError:
     # Support for Python < 2.6
     from django.utils.datastructures import SortedDict as OrderedDict
-from django.utils import six
+import six  # Django six is buggy with Django < 1.5
 from django.utils.encoding import python_2_unicode_compatible
 
 

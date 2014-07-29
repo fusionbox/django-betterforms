@@ -1,4 +1,10 @@
-import unittest  # NOQA
+import sys
+if sys.version_info < (2, 7):
+    # In python < 2.7 unittest doesn't have expectedFailure
+    from django.utils import unittest
+else:
+    # django.utils.unittest became deprecated in Django 1.7
+    import unittest  # NOQA
 
 import mock
 

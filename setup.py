@@ -37,6 +37,7 @@ setup(
     packages=[package for package in find_packages() if package.startswith('betterforms')],
     install_requires=[
         'Django>=1.4',
+        'six',
     ],
     tests_require=[
         'mock>=1.0.1',
