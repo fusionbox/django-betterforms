@@ -1,7 +1,4 @@
-try:
-    from django.utils import unittest
-except ImportError:
-    import unittest  # NOQA
+import unittest  # NOQA
 
 import mock
 
@@ -242,6 +239,8 @@ class TestBetterForm(TestCase):
 class TestBetterModelForm(TestCase):
     def setUp(self):
         class TestModel(models.Model):
+            class Meta:
+                abstract = True
             a = models.CharField(max_length=255)
             b = models.CharField(max_length=255)
             c = models.CharField(max_length=255)
