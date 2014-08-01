@@ -5,6 +5,10 @@ django-betterforms
    :target: http://travis-ci.org/fusionbox/django-betterforms
    :alt: Build Status
 
+.. image:: https://coveralls.io/repos/fusionbox/django-betterforms/badge.png
+   :target: http://coveralls.io/r/fusionbox/django-betterforms
+   :alt: Build Status
+
 `django-betterforms` builds on the build in django forms.
 
 
