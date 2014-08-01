@@ -5,11 +5,19 @@ except ImportError:
     from collections_compat import Counter  # NOQA
 
 from django import forms
-from django.forms.util import ErrorDict
+try:
+    from django.forms.utils import ErrorDict
+except ImportError:
+    # Support Django < 1.7
+    from django.forms.util import ErrorDict
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.template.loader import render_to_string
-from django.utils.datastructures import SortedDict
-from django.utils import six
+try:
+    from collections import OrderedDict
+except ImportError:
+    # Support for Python < 2.6
+    from django.utils.datastructures import SortedDict as OrderedDict
+import six  # Django six is buggy with Django < 1.5
 from django.utils.encoding import python_2_unicode_compatible
 
 
@@ -120,7 +128,7 @@ class BoundFieldset(object):
         self.form = form
         self.name = name
         self.fieldset = fieldset
-        self.rows = SortedDict()
+        self.rows = OrderedDict()
         for row in fieldset:
             self.rows[six.text_type(row)] = row
 
@@ -132,7 +140,7 @@ class BoundFieldset(object):
         # returns the item in the fieldset under the key 'name'
         """
         if isinstance(key, int) and not key in self.rows:
-            return self[self.rows.keyOrder[key]]
+            return self[list(self.rows.keys())[key]]
         value = self.rows[key]
         if isinstance(value, six.string_types):
             return self.form[value]

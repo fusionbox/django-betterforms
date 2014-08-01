@@ -4,7 +4,11 @@ from django import forms
 from django.forms.forms import pretty_name
 from django.core.exceptions import ValidationError, ImproperlyConfigured
 from django.db.models import Q
-from django.utils.datastructures import SortedDict
+try:
+    from collections import OrderedDict
+except ImportError:
+    # Support for Python < 2.6
+    from django.utils.datastructures import SortedDict as OrderedDict
 from django.utils import six
 from django.utils.six.moves import reduce
 from django.utils.http import urlencode
@@ -18,7 +22,7 @@ def construct_querystring(data, **kwargs):
     return urlencode(params)
 
 
-class IterDict(SortedDict):
+class IterDict(OrderedDict):
     """
     Extension of djangos built in sorted dictionary class which iterates
     through the values rather than keys.
@@ -234,7 +238,7 @@ class HeaderSet(object):
 
     def __init__(self, form, headers):
         self.form = form
-        self.headers = SortedDict()
+        self.headers = OrderedDict()
         if headers is None:
             return
         for header in headers:

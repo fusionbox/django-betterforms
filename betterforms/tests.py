@@ -1,6 +1,9 @@
-try:
+import sys
+if sys.version_info < (2, 7):
+    # In python < 2.7 unittest doesn't have expectedFailure
     from django.utils import unittest
-except ImportError:
+else:
+    # django.utils.unittest became deprecated in Django 1.7
     import unittest  # NOQA
 
 import mock
@@ -242,6 +245,8 @@ class TestBetterForm(TestCase):
 class TestBetterModelForm(TestCase):
     def setUp(self):
         class TestModel(models.Model):
+            class Meta:
+                abstract = True
             a = models.CharField(max_length=255)
             b = models.CharField(max_length=255)
             c = models.CharField(max_length=255)
@@ -333,7 +338,7 @@ class TestFormRendering(TestCase):
             label_suffix = ''
 
             a = forms.CharField()
-            b = forms.CharField()
+            b = forms.CharField(required=False)
             c = forms.CharField()
 
         form = TestForm()
@@ -350,7 +355,7 @@ class TestFormRendering(TestCase):
                 <label for="id_a">A</label>
                 <input id="id_a" name="a" type="text" />
             </div>
-            <div class="required b formField">
+            <div class="b formField">
                 <label for="id_b">B</label>
                 <input id="id_b" name="b" type="text" />
             </div>
@@ -369,7 +374,7 @@ class TestFormRendering(TestCase):
                 <input id="id_a" name="a" type="text" />
                 <ul class="errorlist"><li>this is an error message</li></ul>
             </div>
-            <div class="required b formField">
+            <div class="b formField">
                 <label for="id_b">B</label>
                 <input id="id_b" name="b" type="text" />
             </div>
