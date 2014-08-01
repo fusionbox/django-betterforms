@@ -438,6 +438,33 @@ class TestFormRendering(TestCase):
             """,
         )
 
+    def test_fields_django_form_required(self):
+        class TestForm(forms.Form):
+            a = forms.CharField(label='A:')
+            b = forms.CharField(label='B:', required=False)
+
+        form = TestForm()
+
+        env = {
+            'form': form,
+            'no_head': True,
+            'fieldset_template_name': 'betterforms/fieldset_as_div.html',
+            'field_template_name': 'betterforms/field_as_div.html',
+        }
+        self.assertHTMLEqual(
+            render_to_string('betterforms/form_as_fieldsets.html', env),
+            """
+            <div class="a formField required">
+                <label for="id_a">A:</label>
+                <input id="id_a" name="a" type="text" />
+            </div>
+            <div class="b formField">
+                <label for="id_b">B:</label>
+                <input id="id_b" name="b" type="text" />
+            </div>
+            """,
+        )
+
     @unittest.expectedFailure
     def test_form_to_str(self):
         # TODO: how do we test this
