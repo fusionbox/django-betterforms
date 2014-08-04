@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 from setuptools import setup, find_packages
-import subprocess
 import os
+
+from betterforms.version import get_version
 
 __doc__ = """
 App for Django featuring improved form base classes.
@@ -10,21 +11,6 @@ App for Django featuring improved form base classes.
 
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
-
-STAGE = 'alpha'
-
-version = (1, 0, 1, STAGE)
-
-
-def get_version():
-    number = '.'.join(map(str, version[:3]))
-    stage = version[3]
-    if stage == 'final':
-        return number
-    elif stage == 'alpha':
-        process = subprocess.Popen('git rev-parse HEAD'.split(), stdout=subprocess.PIPE)
-        stdout, stderr = process.communicate()
-        return number + '-' + stdout.decode('utf-8').strip()[:8]
 
 setup(
     name='django-betterforms',
