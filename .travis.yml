@@ -16,4 +16,6 @@ install:
   - pip install -q $DJANGO_PACKAGE --use-mirrors
   - python setup.py install
   - pip install mock
-script: make test
+  - pip install coveralls
+script: make coverage
+after_success: cd tests && coveralls

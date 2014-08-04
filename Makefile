@@ -9,7 +9,7 @@ test-builtin:
 	cd tests && DJANGO_SETTINGS_MODULE=$(SETTINGS) $(COVERAGE_COMMAND) ./manage.py test --traceback $(TESTS) --verbosity=2
 
 coverage:
-	+make test COVERAGE_COMMAND='coverage run --source=betterforms --branch --parallel-mode'
+	+make test COVERAGE_COMMAND='coverage run --source=betterforms --omit="*tests*" --branch --parallel-mode'
 	cd tests && coverage combine && coverage html
 
 docs:

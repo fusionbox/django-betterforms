@@ -1,3 +1,4 @@
+from __future__ import print_function
 # python < 2.7 compatibility for collections.Counter
 # source: http://code.activestate.com/recipes/576611-counter-class/
 from operator import itemgetter
@@ -189,4 +190,4 @@ class Counter(dict):
 
 if __name__ == '__main__':
     import doctest
-    print doctest.testmod()
+    print(doctest.testmod())
