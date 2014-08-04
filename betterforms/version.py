@@ -2,7 +2,7 @@ import subprocess
 
 STAGE = 'alpha'
 
-VERSION = (1, 1, 0, STAGE)
+VERSION = (1, 2, 0, STAGE)
 
 
 def get_version():
