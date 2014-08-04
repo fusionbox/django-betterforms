@@ -330,3 +330,26 @@ API Reference
         ``False``, :meth:`MultiModelForm.save` will add a ``save_m2m`` method
         to the :class:`MultiModelForm` instance to aid in saving the
         many-to-many relations later.
+
+
+Addendum About django-multiform
+-------------------------------
+
+There is another Django app that provides a similar wrapper called
+django-multiform that provides essentially the same features as betterform's
+:class:`MultiForm`. I searched for an app that did this feature when I started
+work on betterform's version, but couldn't find one. I have looked at
+django-multiform now and I think that while they are pretty similar, but there
+are some differences which I think should be noted:
+
+1.  django-multiform's ``MultiForm`` class actually inherits from Django's Form
+    class. I don't think it is very clear if this is a benefit or a
+    disadvantage, but to me it seems that it means that there is Form API that
+    exposed by django-multiform's ``MultiForm`` that doesn't actually delegate
+    to the child classes.
+
+2.  I think that django-multiform's method of dispatching the different values
+    for instance and initial to the child classes is more complicated that it
+    needs to be.  Instead of just accepting a dictionary like betterform's
+    :class:`MultiForm` does, with django-multiform, you have to write a
+    `dispatch_init_initial` method.
