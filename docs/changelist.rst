@@ -25,7 +25,7 @@ functionality that deals with operations on lists of model instances.
     a model.  This form adds a field to the model ``q`` for the search query.
 
    .. attribute:: SEARCH_FIELDS
-    
+
      The list of fields that will be searched against.
 
    .. attribute:: CASE_SENSITIVE
@@ -137,7 +137,7 @@ functionality that deals with operations on lists of model instances.
                  model = User
 
       All of these examples are roughly equivilent, resulting in the form
-      haveing three sortable headers, ``('username', 'email', 'name')``, which
+      having three sortable headers, ``('username', 'email', 'name')``, which
       will map to those named fields on the ``User`` model.
 
       See documentation on the :class:`Header` class for more information on
