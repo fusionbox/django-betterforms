@@ -4,6 +4,8 @@ except ImportError:  # Python 2.6, Django < 1.7
     from django.utils.datastructures import SortedDict as OrderedDict  # NOQA
 
 from django import forms
+from django.forms.formsets import formset_factory
+from django.forms.models import modelformset_factory
 from django.contrib.admin import widgets as admin_widgets
 from django.core.exceptions import ValidationError
 
@@ -66,9 +68,15 @@ class NeedsFileField(MultiForm):
 
 
 class BadgeForm(forms.ModelForm):
+
     class Meta:
         model = Badge
         fields = ('name', 'color',)
+
+    # self.label_suffix has to be declared with form instantiation per Django 1.6
+    def __init__(self, *args, **kwargs):
+        super(BadgeForm, self).__init__(*args, **kwargs)
+        self.label_suffix = ''
 
 
 class BadgeMultiForm(MultiModelForm):
@@ -76,6 +84,17 @@ class BadgeMultiForm(MultiModelForm):
         'badge1': BadgeForm,
         'badge2': BadgeForm,
     }
+
+BadgeFormSet = formset_factory(BadgeForm, extra=2)
+
+BadgeDeleteFormSet = formset_factory(BadgeForm, can_delete=True, extra=2)
+
+BadgeOrderFormSet = formset_factory(BadgeForm, can_order=True, extra=2)
+
+try:
+    BadgeModelFormSet = modelformset_factory(Badge, form=BadgeForm, extra=2)
+except PendingDeprecationWarning:
+    BadgeModelFormSet = modelformset_factory(Badge, form=BadgeForm, fields='__all__', extra=2)
 
 
 class NonModelForm(forms.Form):

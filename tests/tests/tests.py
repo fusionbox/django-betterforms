@@ -1,11 +1,18 @@
 try:
+    from unittest import skipIf, skipUnless
+except ImportError:  # Python 2.6, Django < 1.7
+    from django.utils.unittest import skipIf, skipUnless
+
+try:
     from collections import OrderedDict
 except ImportError:  # Python 2.6, Django < 1.7
     from django.utils.datastructures import SortedDict as OrderedDict  # NOQA
 
+import django
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.views.generic import CreateView
+from django.template.loader import render_to_string
 
 try:
     from django.utils.encoding import force_text
@@ -16,6 +23,8 @@ from .models import User, Profile, Badge, Book
 from .forms import (
     UserProfileMultiForm, BadgeMultiForm, ErrorMultiForm,
     MixedForm, NeedsFileField, ManyToManyMultiForm,
+    BadgeFormSet, BadgeDeleteFormSet, BadgeOrderFormSet,
+    BadgeModelFormSet,
 )
 
 
@@ -244,3 +253,219 @@ class MultiModelFormTest(TestCase):
         resp = viewfn(request)
         self.assertEqual(resp.status_code, 302)
         self.assertEqual(Badge.objects.count(), 2)
+
+
+class FormSetRenderTest(TestCase):
+    def setUp(self):
+        if django.VERSION < (1, 7, 0):
+            self.rendered_management_form = """
+            <input id="id_badge-TOTAL_FORMS" name="badge-TOTAL_FORMS" type="hidden" value="2" /><input id="id_badge-INITIAL_FORMS" name="badge-INITIAL_FORMS" type="hidden" value="0" /><input id="id_badge-MAX_NUM_FORMS" name="badge-MAX_NUM_FORMS" type="hidden" value="1000" />
+            """
+        else:
+            self.rendered_management_form = """
+            <input id="id_badge-TOTAL_FORMS" name="badge-TOTAL_FORMS" type="hidden" value="2" /><input id="id_badge-INITIAL_FORMS" name="badge-INITIAL_FORMS" type="hidden" value="0" /><input id="id_badge-MIN_NUM_FORMS" name="badge-MIN_NUM_FORMS" type="hidden" value="0" /><input id="id_badge-MAX_NUM_FORMS" name="badge-MAX_NUM_FORMS" type="hidden" value="1000" />
+            """
+
+    def test_formset_rendering(self):
+        self.formset = BadgeFormSet(prefix="badge")
+        env = {
+            'form': self.formset,
+            'no_head': True,
+        }
+        self.assertHTMLEqual(
+            render_to_string('betterforms/formset_as_fieldsets.html', env),
+            """
+            <div class="formSet badge">
+                {0}
+                <div class="formSetForm badge-0">
+                    <div class="badge-0-name formField required">
+                        <label for="id_badge-0-name">Name</label>
+                        <input id="id_badge-0-name" maxlength="255" name="badge-0-name" type="text" />
+                    </div>
+                    <div class="badge-0-color formField required">
+                        <label for="id_badge-0-color">Color</label>
+                        <input id="id_badge-0-color" maxlength="20" name="badge-0-color" type="text" />
+                    </div>
+                </div>
+                <div class="formSetForm badge-1">
+                    <div class="badge-1-name formField required">
+                        <label for="id_badge-1-name">Name</label>
+                        <input id="id_badge-1-name" maxlength="255" name="badge-1-name" type="text" />
+                    </div>
+                    <div class="badge-1-color formField required">
+                        <label for="id_badge-1-color">Color</label>
+                        <input id="id_badge-1-color" maxlength="20" name="badge-1-color" type="text" />
+                    </div>
+                </div>
+            </div>
+            """.format(self.rendered_management_form)
+        )
+
+    def test_formset_can_delete_rendering(self):
+        self.formset = BadgeDeleteFormSet(prefix="badge")
+        env = {
+            'form': self.formset,
+            'no_head': True,
+        }
+        self.assertHTMLEqual(
+            render_to_string('betterforms/formset_as_fieldsets.html', env),
+            """
+            <div class="formSet badge">
+                {0}
+                <div class="formSetForm badge-0">
+                    <div class="badge-0-name formField required">
+                        <label for="id_badge-0-name">Name</label>
+                        <input id="id_badge-0-name" maxlength="255" name="badge-0-name" type="text" />
+                    </div>
+                    <div class="badge-0-color formField required">
+                        <label for="id_badge-0-color">Color</label>
+                        <input id="id_badge-0-color" maxlength="20" name="badge-0-color" type="text" />
+                    </div>
+                    <div class="badge-0-DELETE formField">
+                        <input id="id_badge-0-DELETE" name="badge-0-DELETE" type="checkbox" />
+                        <label for="id_badge-0-DELETE">Delete</label>
+                    </div>
+                </div>
+                <div class="formSetForm badge-1">
+                    <div class="badge-1-name formField required">
+                        <label for="id_badge-1-name">Name</label>
+                        <input id="id_badge-1-name" maxlength="255" name="badge-1-name" type="text" />
+                    </div>
+                    <div class="badge-1-color formField required">
+                        <label for="id_badge-1-color">Color</label>
+                        <input id="id_badge-1-color" maxlength="20" name="badge-1-color" type="text" />
+                    </div>
+                    <div class="badge-1-DELETE formField">
+                        <input id="id_badge-1-DELETE" name="badge-1-DELETE" type="checkbox" />
+                        <label for="id_badge-1-DELETE">Delete</label>
+                    </div>
+                </div>
+            </div>
+            """.format(self.rendered_management_form)
+        )
+
+    @skipIf(django.VERSION < (1, 6, 0), "Order field changed type from text to number in Django 1.6")
+    def test_formset_can_order_rendering_post_16(self):
+        self.formset = BadgeOrderFormSet(prefix="badge")
+        env = {
+            'form': self.formset,
+            'no_head': True,
+        }
+        self.assertHTMLEqual(
+            render_to_string('betterforms/formset_as_fieldsets.html', env),
+            """
+            <div class="formSet badge">
+                {0}
+                <div class="formSetForm badge-0">
+                    <div class="badge-0-name formField required">
+                        <label for="id_badge-0-name">Name</label>
+                        <input id="id_badge-0-name" maxlength="255" name="badge-0-name" type="text" />
+                    </div>
+                    <div class="badge-0-color formField required">
+                        <label for="id_badge-0-color">Color</label>
+                        <input id="id_badge-0-color" maxlength="20" name="badge-0-color" type="text" />
+                    </div>
+                    <div class="badge-0-ORDER formField">
+                        <label for="id_badge-0-ORDER">Order</label>
+                        <input id="id_badge-0-ORDER" name="badge-0-ORDER" type="number" />
+                    </div>
+                </div>
+                <div class="formSetForm badge-1">
+                    <div class="badge-1-name formField required">
+                        <label for="id_badge-1-name">Name</label>
+                        <input id="id_badge-1-name" maxlength="255" name="badge-1-name" type="text" />
+                    </div>
+                    <div class="badge-1-color formField required">
+                        <label for="id_badge-1-color">Color</label>
+                        <input id="id_badge-1-color" maxlength="20" name="badge-1-color" type="text" />
+                    </div>
+                    <div class="badge-1-ORDER formField">
+                        <label for="id_badge-1-ORDER">Order</label>
+                        <input id="id_badge-1-ORDER" name="badge-1-ORDER" type="number" />
+                    </div>
+                </div>
+            </div>
+            """.format(self.rendered_management_form)
+        )
+
+    @skipUnless(django.VERSION < (1, 6, 0), "Order field changed type from text to number in Django 1.6")
+    def test_formset_can_order_rendering_pre_16(self):
+        self.formset = BadgeOrderFormSet(prefix="badge")
+        env = {
+            'form': self.formset,
+            'no_head': True,
+        }
+        self.assertHTMLEqual(
+            render_to_string('betterforms/formset_as_fieldsets.html', env),
+            """
+            <div class="formSet badge">
+                {0}
+                <div class="formSetForm badge-0">
+                    <div class="badge-0-name formField required">
+                        <label for="id_badge-0-name">Name</label>
+                        <input id="id_badge-0-name" maxlength="255" name="badge-0-name" type="text" />
+                    </div>
+                    <div class="badge-0-color formField required">
+                        <label for="id_badge-0-color">Color</label>
+                        <input id="id_badge-0-color" maxlength="20" name="badge-0-color" type="text" />
+                    </div>
+                    <div class="badge-0-ORDER formField">
+                        <label for="id_badge-0-ORDER">Order</label>
+                        <input id="id_badge-0-ORDER" name="badge-0-ORDER" type="text" />
+                    </div>
+                </div>
+                <div class="formSetForm badge-1">
+                    <div class="badge-1-name formField required">
+                        <label for="id_badge-1-name">Name</label>
+                        <input id="id_badge-1-name" maxlength="255" name="badge-1-name" type="text" />
+                    </div>
+                    <div class="badge-1-color formField required">
+                        <label for="id_badge-1-color">Color</label>
+                        <input id="id_badge-1-color" maxlength="20" name="badge-1-color" type="text" />
+                    </div>
+                    <div class="badge-1-ORDER formField">
+                        <label for="id_badge-1-ORDER">Order</label>
+                        <input id="id_badge-1-ORDER" name="badge-1-ORDER" type="text" />
+                    </div>
+                </div>
+            </div>
+            """.format(self.rendered_management_form)
+        )
+
+    def test_modelformset_rendering(self):
+        self.formset = BadgeModelFormSet(prefix="badge")
+        env = {
+            'form': self.formset,
+            'no_head': True,
+        }
+        self.maxDiff = None
+        self.assertHTMLEqual(
+            render_to_string('betterforms/formset_as_fieldsets.html', env),
+            """
+            <div class="formSet badge">
+                {0}
+                <div class="formSetForm badge-0">
+                    <div class="badge-0-name formField required">
+                        <label for="id_badge-0-name">Name</label>
+                        <input id="id_badge-0-name" maxlength="255" name="badge-0-name" type="text" />
+                    </div>
+                    <div class="badge-0-color formField required">
+                        <label for="id_badge-0-color">Color</label>
+                        <input id="id_badge-0-color" maxlength="20" name="badge-0-color" type="text" />
+                    </div>
+                    <input id="id_badge-0-id" name="badge-0-id" type="hidden" />
+                </div>
+                <div class="formSetForm badge-1">
+                    <div class="badge-1-name formField required">
+                        <label for="id_badge-1-name">Name</label>
+                        <input id="id_badge-1-name" maxlength="255" name="badge-1-name" type="text" />
+                    </div>
+                    <div class="badge-1-color formField required">
+                        <label for="id_badge-1-color">Color</label>
+                        <input id="id_badge-1-color" maxlength="20" name="badge-1-color" type="text" />
+                    </div>
+                    <input id="id_badge-1-id" name="badge-1-id" type="hidden" />
+                </div>
+            </div>
+            """.format(self.rendered_management_form)
+        )

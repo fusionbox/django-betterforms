@@ -1,6 +1,7 @@
 1.2.0 (not yet released)
 ------------------------
 
+  - (Feature) Add partial template for rendering formsets [Scott Clark, #18]
 
 1.1.0 (2014-08-04)
 ------------------

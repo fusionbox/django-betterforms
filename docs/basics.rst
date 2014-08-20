@@ -177,3 +177,11 @@ convenient class attribute on the :class:`BetterForm` and
     #18134`_.
 
 .. _Django bug #18134: https://code.djangoproject.com/ticket/18134
+
+Betterforms also provides a partial template for rendering formsets.
+``betterforms/formset_as_fieldsets.html`` will render the management
+form for the formset as well as wrap each individual form in a ``div``
+containing the class attributes of ``formSetForm`` and the unique
+prefix value of each form. Form fields, including additional fields
+for deleting and ordering the forms within the formset, will be
+rendered using the ``betterforms/field_as_div.html`` template.
