@@ -2,7 +2,7 @@ import subprocess
 
 STAGE = 'final'
 
-VERSION = (1, 1, 0, STAGE)
+VERSION = (1, 1, 1, STAGE)
 
 
 def get_version():
