@@ -21,6 +21,7 @@ from betterforms.changelist import (
 from betterforms.forms import (
     BetterForm, BetterModelForm, Fieldset, BoundFieldset, flatten_to_tuple,
 )
+from betterforms.collections_compat import Counter
 
 
 class TestUtils(TestCase):
@@ -33,6 +34,71 @@ class TestUtils(TestCase):
 
         fields3 = ('a', ('b', 'c'), 'd', ('e', ('f', 'g', ('h',)), 'i'))
         self.assertTupleEqual(flatten_to_tuple(fields3), ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'))
+
+
+class TestCounter(TestCase):
+    def test_counter_most_common(self):
+        counter = Counter('abbccc')
+        self.assertEqual(counter.most_common(), [('c', 3), ('b', 2), ('a', 1)])
+        self.assertEqual(counter.most_common(2), [('c', 3), ('b', 2)])
+
+    def test_counter_elements(self):
+        counter = Counter('cccbba')
+        self.assertEqual(sorted(counter.elements()), ['a', 'b', 'b', 'c', 'c', 'c'])
+
+    def test_counter_update(self):
+        counter = Counter('aa')
+        self.assertEqual(counter['a'], 2)
+        counter.update(Counter('abra'))
+        self.assertEqual(counter['a'], 4)
+
+    def test_counter_copy(self):
+        counter = Counter('abc')
+        new_counter = counter.copy()
+        self.assertEqual(counter, new_counter)
+
+    def test_counter_delete_element(self):
+        counter = Counter('abracadabra')
+        self.assertEqual(counter['a'], 5)
+        del counter['a']
+        self.assertEqual(counter['a'], 0)
+
+    def test_counter_repr(self):
+        counter = Counter('abbccc')
+        self.assertEqual(counter.__repr__(), "Counter({'c': 3, 'b': 2, 'a': 1})")
+
+    def test_counter_add(self):
+        counter1 = Counter('abbccc')
+        counter2 = Counter('aaabbc')
+        counter3 = counter1 + counter2
+        for letter in ['a', 'b', 'c']:
+            self.assertEqual(counter3[letter], 4)
+
+    def test_counter_sub(self):
+        counter1 = Counter('abbccc')
+        counter2 = Counter('abc')
+        counter3 = counter1 - counter2
+        self.assertEqual(counter3['a'], 0)
+        self.assertEqual(counter3['b'], 1)
+        self.assertEqual(counter3['c'], 2)
+
+    def test_counter_or(self):
+        counter1 = Counter('abbccc')
+        counter2 = Counter('bbbccd')
+        counter3 = counter1 | counter2
+        self.assertEqual(counter3['a'], 1)
+        self.assertEqual(counter3['b'], 3)
+        self.assertEqual(counter3['c'], 3)
+        self.assertEqual(counter3['d'], 1)
+
+    def test_counter_and(self):
+        counter1 = Counter('abbccc')
+        counter2 = Counter('bbbccd')
+        counter3 = counter1 & counter2
+        self.assertEqual(counter3['a'], 0)
+        self.assertEqual(counter3['b'], 2)
+        self.assertEqual(counter3['c'], 2)
+        self.assertEqual(counter3['d'], 0)
 
 
 class TestFieldSets(TestCase):
