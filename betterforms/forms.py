@@ -132,21 +132,6 @@ class BoundFieldset(object):
         for row in fieldset:
             self.rows[six.text_type(row)] = row
 
-    def __getitem__(self, key):
-        """
-        >>> fieldset[1]
-        # returns the item at index-1 in the fieldset
-        >>> fieldset['name']
-        # returns the item in the fieldset under the key 'name'
-        """
-        if isinstance(key, int) and not key in self.rows:
-            return self[list(self.rows.keys())[key]]
-        value = self.rows[key]
-        if isinstance(value, six.string_types):
-            return self.form[value]
-        else:
-            return type(self)(self.form, value, key)
-
     def __str__(self):
         env = {
             'fieldset': self,
@@ -157,8 +142,12 @@ class BoundFieldset(object):
         return render_to_string(self.template_name or 'betterforms/fieldset_as_div.html', env)
 
     def __iter__(self):
-        for name in self.rows.keys():
-            yield self[name]
+        for key in self.rows.keys():
+            value = self.rows[key]
+            if isinstance(value, six.string_types):
+                yield self.form[value]
+            else:
+                yield type(self)(self.form, value, key)
 
     @property
     def template_name(self):
@@ -192,12 +181,6 @@ class FieldsetMixin(NonBraindamagedErrorMixin):
         if self.base_fieldsets is None:
             return self.bound_fieldset_class(self, self.fields.keys(), '__base_fieldset__')
         return self.bound_fieldset_class(self, self.base_fieldsets, self.base_fieldsets.name)
-
-    def __getitem__(self, key):
-        try:
-            return super(FieldsetMixin, self).__getitem__(key)
-        except KeyError:
-            return self.fieldsets[key]
 
     def __iter__(self):
         for fieldset in self.fieldsets:
