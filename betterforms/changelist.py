@@ -18,8 +18,15 @@ from .forms import BetterForm
 
 def construct_querystring(data, **kwargs):
     params = copy.copy(data)
-    params.update(kwargs)
-    return urlencode(params)
+
+    # We can't call update here because QueryDict extends rather than replaces.
+    for key, value in kwargs.items():
+        params[key] = value
+
+    if hasattr(params, 'urlencode'):
+        return params.urlencode()
+    else:
+        return urlencode(params)
 
 
 class IterDict(OrderedDict):
