@@ -312,7 +312,7 @@ class SortFormBase(BetterForm):
 
     def __init__(self, *args, **kwargs):
         super(SortFormBase, self).__init__(*args, **kwargs)
-        self.headers = HeaderSet(self, self.HEADERS)
+        self.headers = self.HeaderSetClass(self, self.HEADERS)
 
     def clean_sorts(self):
         cleaned_data = self.cleaned_data
