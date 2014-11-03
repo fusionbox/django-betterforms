@@ -282,7 +282,26 @@ class HeaderSet(object):
             return self.HeaderClass.BoundClass(self.form, self.headers[key])
 
 
-class SortForm(BaseChangeListForm):
+class SortFormBase(BetterForm):
+    """
+    A base class for writing your own SortForm. This form handles everything
+    except applying the sorts to the queryset, which is convenient if you
+    aren't working within the ChangeListForm paradigm.
+
+    Usage::
+
+        class MyForm(SortFormBase):
+            HEADERS = (
+                Header('name', label='Name'),
+            )
+
+            # fields ...
+
+            def get_results(self):
+                queryset = # ...
+                queryset = self.apply_sorting(queryset)
+                return queryset
+    """
     HeaderSetClass = HeaderSet
     error_messages = {
         'unknown_header': 'Invalid sort parameter',
@@ -292,7 +311,7 @@ class SortForm(BaseChangeListForm):
     sorts = forms.CharField(required=False, widget=forms.HiddenInput())
 
     def __init__(self, *args, **kwargs):
-        super(SortForm, self).__init__(*args, **kwargs)
+        super(SortFormBase, self).__init__(*args, **kwargs)
         self.headers = HeaderSet(self, self.HEADERS)
 
     def clean_sorts(self):
@@ -324,15 +343,18 @@ class SortForm(BaseChangeListForm):
             order_by.append(param)
         return order_by
 
+    def apply_sorting(self, qs):
+        order_by = self.get_order_by()
+        if order_by:
+            qs = qs.order_by(*order_by)
+        return qs
+
+
+class SortForm(BaseChangeListForm, SortFormBase):
     def get_queryset(self):
         """
         Returns an ordered queryset, sorted based on the values submitted in
         the sort parameter.
         """
         qs = super(SortForm, self).get_queryset()
-
-        order_by = self.get_order_by()
-        if order_by:
-            qs = qs.order_by(*order_by)
-
-        return qs
+        return self.apply_sorting(qs)
