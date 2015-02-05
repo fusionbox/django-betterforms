@@ -71,6 +71,8 @@ class MultiForm(object):
     def non_field_errors(self):
         return ErrorList(chain.from_iterable(
             form.non_field_errors() for form in self.forms.values()
+            # FormSets don't have non_field_errors errors
+            if hasattr(form, 'non_field_errors')
         ))
 
     def as_table(self):

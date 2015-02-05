@@ -15,7 +15,7 @@ except ImportError:  # Django < 1.5
 from .models import User, Profile, Badge, Book
 from .forms import (
     UserProfileMultiForm, BadgeMultiForm, ErrorMultiForm,
-    MixedForm, NeedsFileField, ManyToManyMultiForm,
+    MixedForm, NeedsFileField, ManyToManyMultiForm, BookMultiForm,
 )
 
 
@@ -244,3 +244,14 @@ class MultiModelFormTest(TestCase):
         resp = viewfn(request)
         self.assertEqual(resp.status_code, 302)
         self.assertEqual(Badge.objects.count(), 2)
+
+    def test_non_field_errors_with_formset(self):
+        form = BookMultiForm({
+            'book-name': '',
+            'images-0-name': '',
+            'images-TOTAL_FORMS': '3',
+            'images-INITIAL_FORMS': '0',
+            'images-MAX_NUM_FORMS': '1000',
+        })
+        # assertDoesntRaise AttributeError
+        self.assertEqual(form.non_field_errors().as_text(), '* It broke')
