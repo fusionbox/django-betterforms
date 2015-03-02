@@ -100,3 +100,23 @@ class ManyToManyMultiForm(MultiModelForm):
         'badge': BadgeForm,
         'author': AuthorForm,
     }
+
+
+class OptionalFileForm(forms.Form):
+    myfile = forms.FileField(required=False)
+
+
+class Step1Form(MultiModelForm):
+    # This is required because the WizardView introspects it, but we don't have
+    # a way of determining this dynamically, so just set it to an empty
+    # dictionary.
+    base_fields = {}
+
+    form_classes = {
+        'myfile': OptionalFileForm,
+        'profile': ProfileForm,
+    }
+
+
+class Step2Form(forms.Form):
+    confirm = forms.BooleanField(required=True)

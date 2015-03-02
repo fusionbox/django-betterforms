@@ -213,6 +213,59 @@ user/profile example, it would look something like this::
             return kwargs
 
 
+Working with WizardView
+-----------------------
+
+:class:`MultiForms <MultiForm>` also support the ``WizardView`` classes
+provided by django-formtools_ (or Django before 1.8), however you must set a
+``base_fields`` attribute on your form class. ::
+
+    # forms.py
+    from django import forms
+    from betterforms.multiform import MultiForm
+
+    class Step1Form(MultiModelForm):
+        # We have to set base_fields to a dictionary because the WizardView
+        # tries to introspect it.
+        base_fields = {}
+
+        form_classes = {
+            'user': UserEditForm,
+            'profile': UserProfileForm,
+        }
+
+Then you can use it like normal. ::
+
+    # views.py
+    try:
+        from django.contrib.formtools.wizard.views import SessionWizardView
+    except ImportError:  # Django >= 1.8
+        from formtools.wizard.views import SessionWizardView
+
+    from .forms import Step1Form, Step2Form
+
+    class MyWizardView(SessionWizardView):
+        def done(self, form_list, form_dict, **kwargs):
+            step1form = form_dict['1']
+            # You can get the data for the user form like this:
+            user = step1form['user'].save()
+            # ...
+
+    wizard_view = MyWizardView.as_view([Step1Form, Step2Form])
+
+The reason we have to set ``base_fields`` to a dictionary is that the
+``WizardView`` does some introspection to determine if any of the forms accept
+files and then it makes sure that the ``WizardView`` has a ``file_storage`` on
+it. By setting ``base_fields`` to an empty dictionary, we can bypass this check.
+
+.. warning::
+
+    If you have have any forms that accept Files, you must configure the
+    ``file_storage`` attribute for your WizardView.
+
+.. _django-formtools: http://django-formtools.readthedocs.org/en/latest/wizard.html
+
+
 API Reference
 -------------
 
