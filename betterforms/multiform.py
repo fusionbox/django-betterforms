@@ -17,6 +17,14 @@ from django.utils.safestring import mark_safe
 from django.utils.six.moves import reduce
 
 
+class classproperty(property):
+    """
+    Subclass property to make classmethod properties possible
+    """
+    def __get__(self, cls, owner):
+        return self.fget.__get__(None, owner)()
+
+
 @python_2_unicode_compatible
 class MultiForm(object):
     """
@@ -135,6 +143,16 @@ class MultiForm(object):
             (key, form.cleaned_data)
             for key, form in self.forms.items() if form.is_valid()
         )
+
+    @classproperty
+    @classmethod
+    def base_fields(cls):
+        all_base_fields = OrderedDict()
+        for key, form_cls in cls.form_classes.items():
+            for name, field in form_cls.base_fields.items():
+                full_name = '{0}__{1}'.format(key, name)
+                all_base_fields[full_name] = field
+        return all_base_fields
 
 
 class MultiModelForm(MultiForm):
