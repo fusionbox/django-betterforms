@@ -12,6 +12,7 @@ except ImportError:  # Django < 1.7
     from django.forms.util import ErrorDict, ErrorList  # NOQA
 
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils.safestring import mark_safe
 from django.utils.six.moves import reduce
 
 
@@ -74,13 +75,13 @@ class MultiForm(object):
         ))
 
     def as_table(self):
-        return ''.join(form.as_table() for form in self.forms.values())
+        return mark_safe(''.join(form.as_table() for form in self.forms.values()))
 
     def as_ul(self):
-        return ''.join(form.as_ul() for form in self.forms.values())
+        return mark_safe(''.join(form.as_ul() for form in self.forms.values()))
 
     def as_p(self):
-        return ''.join(form.as_p() for form in self.forms.values())
+        return mark_safe(''.join(form.as_p() for form in self.forms.values()))
 
     def is_multipart(self):
         return any(form.is_multipart() for form in self.forms.values())
