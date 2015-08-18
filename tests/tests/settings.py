@@ -5,6 +5,13 @@ SECRET_KEY = 'JVpuGfSgVm2IxJ03xArw5mwmPuYEzAJMbhsTnvLXOPSQR4z93o'
 
 PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
 
+MIDDLEWARE_CLASSES = (
+    'django.middleware.common.CommonMiddleware',
+    # We need the SessionMiddleware for the WizardView support tests in Django >= 1.7
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+)
+
 INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.contenttypes',

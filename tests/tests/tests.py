@@ -6,6 +6,7 @@ except ImportError:  # Python 2.6, Django < 1.7
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.views.generic import CreateView
+from django.core import urlresolvers
 
 try:
     from django.utils.encoding import force_text
@@ -16,6 +17,7 @@ from .models import User, Profile, Badge, Book
 from .forms import (
     UserProfileMultiForm, BadgeMultiForm, ErrorMultiForm,
     MixedForm, NeedsFileField, ManyToManyMultiForm,
+    Step2Form,
 )
 
 
@@ -154,6 +156,28 @@ class MultiFormTest(TestCase):
     def test_handles_none_initial_value(self):
         # Used to throw an AttributeError
         UserProfileMultiForm(initial=None)
+
+    def test_works_with_wizard_view(self):
+        url = urlresolvers.reverse('test_wizard')
+        self.client.get(url)
+
+        response = self.client.post(url, {
+            'test_wizard_view-current_step': '0',
+            'profile__0-name': 'John Doe',
+        })
+        view = response.context['view']
+        self.assertEqual(view.storage.current_step, '1')
+
+        response = self.client.post(url, {
+            'test_wizard_view-current_step': '1',
+            '1-confirm': True,
+        })
+        form_list = response.context['form_list']
+        # In Django>=1.7 on Python 3, form_list is a ValuesView, which doesn't
+        # support indexing, you are probably recommending to use form_dict
+        # instead of form_list on Django>=1.7 anyway though.
+        form_list = list(form_list)
+        self.assertEqual(form_list[0]['profile'].cleaned_data['name'], 'John Doe')
 
 
 class MultiModelFormTest(TestCase):

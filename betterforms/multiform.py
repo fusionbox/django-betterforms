@@ -26,7 +26,14 @@ class MultiForm(object):
     """
     form_classes = {}
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, data=None, files=None, *args, **kwargs):
+        # Some things, such as the WizardView expect these to exist.
+        self.data, self.files = data, files
+        kwargs.update(
+            data=data,
+            files=files,
+        )
+
         self.initials = kwargs.pop('initial', None)
         if self.initials is None:
             self.initials = {}
