@@ -14,6 +14,7 @@ from django.conf import settings
 from django.db import models
 from django.test import TestCase
 from django.template.loader import render_to_string
+from django.http import QueryDict
 
 from betterforms.changelist import (
     BaseChangeListForm, SearchForm, SortForm, HeaderSet, Header, BoundHeader
@@ -1000,6 +1001,41 @@ class TestBoundHeaderAPI(TestCase):
         self.assertEqual(header_set['field_c'].querystring, 'sorts=3.1.-2')
         self.assertEqual(header_set['field_c'].singular_querystring, 'sorts=3')
         self.assertEqual(header_set['field_c'].remove_querystring, 'sorts=1.-2')
+
+    def assertQueryStringEqual(self, a, b, *args, **kwargs):
+        """
+        We need this because QueryDicts are dicts and key-ordering is not
+        guaranteed on Python3. So we just convert query_strings back into
+        QueryDicts to compare them.
+        """
+        self.assertEqual(QueryDict(a), QueryDict(b), *args, **kwargs)
+
+    def test_bound_header_querystring_with_querydict(self):
+        HEADERS = (
+            Header('field_a'),
+        )
+        self.form.data = QueryDict('field=value')
+        self.form.cleaned_data = {'field': 'value'}
+        self.form.HEADERS = HEADERS
+        header_set = HeaderSet(self.form, HEADERS)
+
+        self.assertQueryStringEqual(header_set['field_a'].querystring, 'field=value&sorts=1')
+        self.assertQueryStringEqual(header_set['field_a'].singular_querystring, 'field=value&sorts=1')
+        self.assertQueryStringEqual(header_set['field_a'].remove_querystring, 'field=value&sorts=')
+
+    def test_bound_header_querystring_with_querydict_overwrites_instead_of_appending(self):
+        HEADERS = (
+            Header('field_a'),
+        )
+        self.form.data = QueryDict('field=value&sorts=1')
+        self.form.cleaned_data = {'field': 'value', 'sorts': [1]}
+        self.form.HEADERS = HEADERS
+        header_set = HeaderSet(self.form, HEADERS)
+
+        # It used to output 'field=value&sorts=1&sorts=-1'
+        self.assertQueryStringEqual(header_set['field_a'].querystring, 'field=value&sorts=-1')
+        self.assertQueryStringEqual(header_set['field_a'].singular_querystring, 'field=value&sorts=-1')
+        self.assertQueryStringEqual(header_set['field_a'].remove_querystring, 'field=value&sorts=')
 
 
 class TestSortFormAPI(TestCase):
