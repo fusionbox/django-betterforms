@@ -5,6 +5,7 @@ except ImportError:  # Python 2.6, Django < 1.7
 
 from django.test import TestCase
 from django.test.client import RequestFactory
+from django.utils.safestring import SafeText
 from django.views.generic import CreateView
 from django.core import urlresolvers
 
@@ -51,7 +52,9 @@ class MultiFormTest(TestCase):
         form = UserProfileMultiForm()
         user_table = form['user'].as_table()
         profile_table = form['profile'].as_table()
-        self.assertEqual(form.as_table(), user_table + profile_table)
+        multi_table = form.as_table()
+        self.assertEqual(multi_table, user_table + profile_table)
+        self.assertIsInstance(multi_table, SafeText)
 
     def test_to_str_is_as_table(self):
         form = UserProfileMultiForm()
@@ -61,13 +64,17 @@ class MultiFormTest(TestCase):
         form = UserProfileMultiForm()
         user_ul = form['user'].as_ul()
         profile_ul = form['profile'].as_ul()
-        self.assertEqual(form.as_ul(), user_ul + profile_ul)
+        multi_ul = form.as_ul()
+        self.assertEqual(multi_ul, user_ul + profile_ul)
+        self.assertIsInstance(multi_ul, SafeText)
 
     def test_as_p(self):
         form = UserProfileMultiForm()
         user_p = form['user'].as_p()
         profile_p = form['profile'].as_p()
-        self.assertEqual(form.as_p(), user_p + profile_p)
+        multi_p = form.as_p()
+        self.assertEqual(multi_p, user_p + profile_p)
+        self.assertIsInstance(multi_p, SafeText)
 
     def test_is_not_valid(self):
         form = UserProfileMultiForm({
