@@ -8,8 +8,6 @@ env:
   - DJANGO_PACKAGE=https://github.com/django/django/archive/stable/1.7.x.zip
 matrix:
   include:
-    - python: "2.6"
-      env: DJANGO_PACKAGE=https://github.com/django/django/archive/stable/1.4.x.zip
     - python: "2.7"
       env: DJANGO_PACKAGE=https://github.com/django/django/archive/stable/1.4.x.zip
 install:
