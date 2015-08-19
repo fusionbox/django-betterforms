@@ -12,11 +12,9 @@ except ImportError:
     from django.forms.util import ErrorDict
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.template.loader import render_to_string
-try:
-    from collections import OrderedDict
-except ImportError:
-    # Support for Python < 2.6
-    from django.utils.datastructures import SortedDict as OrderedDict
+
+from collections import OrderedDict
+
 import six  # Django six is buggy with Django < 1.5
 from django.utils.encoding import python_2_unicode_compatible
 

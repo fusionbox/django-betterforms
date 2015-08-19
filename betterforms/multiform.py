@@ -1,10 +1,7 @@
 from itertools import chain
 from operator import add
 
-try:
-    from collections import OrderedDict
-except ImportError:  # Python 2.6, Django < 1.7
-    from django.utils.datastructures import SortedDict as OrderedDict  # NOQA
+from collections import OrderedDict
 
 try:
     from django.forms.utils import ErrorDict, ErrorList
