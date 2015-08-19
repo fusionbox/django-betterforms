@@ -17,7 +17,7 @@ from .models import User, Profile, Badge, Book
 from .forms import (
     UserProfileMultiForm, BadgeMultiForm, ErrorMultiForm,
     MixedForm, NeedsFileField, ManyToManyMultiForm,
-    Step2Form,
+    Step2Form, ReorderedForm
 )
 
 
@@ -178,6 +178,15 @@ class MultiFormTest(TestCase):
         # instead of form_list on Django>=1.7 anyway though.
         form_list = list(form_list)
         self.assertEqual(form_list[0]['profile'].cleaned_data['name'], 'John Doe')
+
+    def test_reordered_form(self):
+        form = ReorderedForm()
+        fields = [field.field for field in form]
+        self.assertEqual(fields, [
+            form['profile'].fields['name'],
+            form['myfile'].fields['myfile'],
+            form['profile'].fields['display_name'],
+        ])
 
 
 class MultiModelFormTest(TestCase):

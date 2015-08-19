@@ -25,6 +25,7 @@ class MultiForm(object):
     else that you are using a MultiForm.
     """
     form_classes = {}
+    field_order = []
 
     def __init__(self, data=None, files=None, *args, **kwargs):
         # Some things, such as the WizardView expect these to exist.
@@ -65,9 +66,19 @@ class MultiForm(object):
     def __getitem__(self, key):
         return self.forms[key]
 
+    def _reordered_fields_iter(self):
+        for form_key, field_key in self.field_order:
+            if field_key == '__all__':
+                for field in self.forms[form_key]:
+                    yield field
+            else:
+                yield self.forms[form_key][field_key]
+
     def __iter__(self):
-        # TODO: Should the order of the fields be controllable from here?
-        return chain.from_iterable(self.forms.values())
+        if self.field_order:
+            return self._reordered_fields_iter()
+        else:
+            return chain.from_iterable(self.forms.values())
 
     @property
     def is_bound(self):
