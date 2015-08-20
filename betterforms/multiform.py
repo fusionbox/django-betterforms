@@ -150,8 +150,7 @@ class MultiForm(object):
         all_base_fields = OrderedDict()
         for key, form_cls in cls.form_classes.items():
             for name, field in form_cls.base_fields.items():
-                full_name = '{0}__{1}'.format(key, name)
-                all_base_fields[full_name] = field
+                all_base_fields[(key, name)] = field
         return all_base_fields
 
 
