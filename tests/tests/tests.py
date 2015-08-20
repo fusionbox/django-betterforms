@@ -21,15 +21,7 @@ from .forms import (
 )
 
 
-class HtmlTest(TestCase):
-    def assertHtmlEqual(self, got, want):
-        got = ' '.join(got.strip().split())
-        want = ' '.join(want.strip().split())
-
-        self.assertEqual(got, want)
-
-
-class MultiFormTest(HtmlTest):
+class MultiFormTest(TestCase):
     def test_initial_data(self):
         form = UserProfileMultiForm(
             initial={
@@ -59,7 +51,7 @@ class MultiFormTest(HtmlTest):
         form = UserProfileMultiForm()
         user_table = form['user'].as_table()
         profile_table = form['profile'].as_table()
-        self.assertHtmlEqual(form.as_table(), user_table + ' ' + profile_table)
+        self.assertHTMLEqual(form.as_table(), user_table + ' ' + profile_table)
 
     def test_to_str_is_as_table(self):
         form = UserProfileMultiForm()
@@ -69,13 +61,13 @@ class MultiFormTest(HtmlTest):
         form = UserProfileMultiForm()
         user_ul = form['user'].as_ul()
         profile_ul = form['profile'].as_ul()
-        self.assertHtmlEqual(form.as_ul(), user_ul + ' ' + profile_ul)
+        self.assertHTMLEqual(form.as_ul(), user_ul + ' ' + profile_ul)
 
     def test_as_p(self):
         form = UserProfileMultiForm()
         user_p = form['user'].as_p()
         profile_p = form['profile'].as_p()
-        self.assertHtmlEqual(form.as_p(), user_p + ' ' + profile_p)
+        self.assertHTMLEqual(form.as_p(), user_p + ' ' + profile_p)
 
     def test_is_not_valid(self):
         form = UserProfileMultiForm({
