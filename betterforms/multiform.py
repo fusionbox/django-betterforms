@@ -41,7 +41,7 @@ class WhitelistedBaseForm(object):
     def __str__(self):
         return self.as_table()
 
-    if '__repr__' in BaseForm.__dict__:
+    if '__repr__' in BaseForm.__dict__: # For Django < 1.7
         __repr__ = BaseForm.__dict__['__repr__']
     __iter__ = BaseForm.__dict__['__iter__']
     add_prefix = BaseForm.__dict__['add_prefix']
