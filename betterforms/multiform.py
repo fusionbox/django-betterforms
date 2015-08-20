@@ -16,6 +16,7 @@ except ImportError:  # Django < 1.7
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.safestring import mark_safe
 from django.utils.six.moves import reduce
+from django.utils.six import string_types
 
 
 @python_2_unicode_compatible
@@ -83,8 +84,7 @@ class MultiForm(WhitelistedBaseForm):
         self.fields = OrderedDict()
         for key, form in self.forms.items():
             for name, field in form.fields.items():
-                full_name = '__{0}__{1}'.format(key, name)
-                self.fields[full_name] = field
+                self.fields[(key, name)] = field
 
         self.order_fields(self.field_order)
 
@@ -94,7 +94,7 @@ class MultiForm(WhitelistedBaseForm):
         fields = OrderedDict()
 
         def add_field(key, name):
-            full_name = '__{0}__{1}'.format(key, name)
+            full_name = (key, name)
             try:
                 fields[full_name] = self.fields.pop(full_name)
             except KeyError:  # ignore unknown fields
@@ -126,11 +126,11 @@ class MultiForm(WhitelistedBaseForm):
         return args, fkwargs
 
     def __getitem__(self, key):
-        if key.startswith('__'):
-            key, name = key[2:].split('__', 1)
-            return self.forms[key][name]
-        else:
+        if isinstance(key, string_types):
             return self.forms[key]
+        else:
+            key, name = key
+            return self.forms[key][name]
 
     @property
     def is_bound(self):
