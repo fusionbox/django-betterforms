@@ -153,10 +153,11 @@ class MultiFormTest(TestCase):
         # Used to throw an AttributeError
         UserProfileMultiForm(initial=None)
 
-    def test_works_with_wizard_view(self):
+    def test_wizard_view_raises_file_no_storage(self):
         with self.assertRaises(NoFileStorageConfigured):
             TestInvalidWizardView.as_view([Step1Form, Step2Form])
 
+    def test_works_with_wizard_view(self):
         url = urlresolvers.reverse('test_wizard')
         response = self.client.post(url, {
             'test_wizard_view-current_step': '0',
