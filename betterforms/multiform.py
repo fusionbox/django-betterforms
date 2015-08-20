@@ -20,6 +20,16 @@ from django.utils.six.moves import reduce
 
 @python_2_unicode_compatible
 class WhitelistedBaseForm(object):
+    """
+    If MultiForm inherited directly from django.forms.BaseForm, it may appear
+    to have functionality that hasn't actually be implemented correctly,
+    resulting in methods and properties having to be deleted.
+
+    This baseclass copies methods and properties from BaseForm related to html
+    output from BaseForm's __dict__, ensuring we're in control of MultiForm's
+    interface.
+    """
+
     def __init__(self, auto_id='id_%s', prefix=None, error_class=ErrorList,
                  label_suffix=':', *args, **kwargs):
         self.auto_id = auto_id
