@@ -98,7 +98,7 @@ class MultiForm(WhitelistedBaseForm):
             try:
                 fields[full_name] = self.fields.pop(full_name)
             except KeyError:  # ignore unknown fields
-                print("unknown field", full_name)
+                pass
 
         for key, name in field_order:
             if name == '__all__':
