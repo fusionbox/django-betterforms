@@ -12,7 +12,15 @@ coverage:
 	+make test COVERAGE_COMMAND='coverage run --source=betterforms --omit="*tests*" --branch --parallel-mode'
 	cd tests && coverage combine && coverage html
 
+tox:
+ifdef TRAVIS
+	make coverage
+else
+	make test
+endif
+
 docs:
 	cd docs && $(MAKE) html
+
 
 .PHONY: test test-builtin coverage docs
