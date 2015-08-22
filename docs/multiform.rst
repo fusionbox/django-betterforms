@@ -67,6 +67,13 @@ it is merely an approximation, is interoperability with ``WizardView``, which
 introspects the values of :attr:`~MultiForm.base_fields`.  See
 :ref:`wizardview_guide`.
 
+.. warning::
+
+    If you add a ``FileField`` to ``YourInnerForm.fields`` after form
+    initialisation, and you have not configured ``YourWizardView.file_storage``
+    your ``FileField`` will fail silently. You must configure ``file_storage``
+    on YourWizardView as explained in the django-formtools_ documention.
+
 
 Working with ModelForms
 -----------------------
