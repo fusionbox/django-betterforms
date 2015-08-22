@@ -4,7 +4,7 @@
 {% else %}
 <div class="{% if field.css_classes %}{{ field.css_classes }} {% endif %}{{ field.html_name }}{% if field.form.prefix %} {{ field.name }}{% endif %} formField{% if field.field.required and not field.form.required_css_class %} required{% endif %}">
   {% if not field|is_checkbox %}
-    {{ field.label_tag }}
+    {{ field|label_tag }}
   {% endif %}
 
   {% if field.help_text %}
@@ -13,7 +13,7 @@
 
   {{ field }}
   {% if field|is_checkbox %}
-    {{ field.label_tag }}
+    {{ field|label_tag }}
   {% endif %}
   {{ field.errors }}
 </div>

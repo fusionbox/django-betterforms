@@ -353,7 +353,7 @@ class TestFormRendering(TestCase):
             render_to_string('betterforms/form_as_fieldsets.html', env),
             """
             <div class="required a formField">
-                <label for="id_a">A</label>
+                <label class="required" for="id_a">A</label>
                 <input id="id_a" name="a" type="text" />
             </div>
             <div class="b formField">
@@ -361,7 +361,7 @@ class TestFormRendering(TestCase):
                 <input id="id_b" name="b" type="text" />
             </div>
             <div class="required c formField">
-                <label for="id_c">C</label>
+                <label class="required" for="id_c">C</label>
                 <input id="id_c" name="c" type="text" />
             </div>
             """,
@@ -371,7 +371,7 @@ class TestFormRendering(TestCase):
             render_to_string('betterforms/form_as_fieldsets.html', env),
             """
             <div class="required error a formField">
-                <label for="id_a">A</label>
+                <label class="required" for="id_a">A</label>
                 <input id="id_a" name="a" type="text" />
                 <ul class="errorlist"><li>this is an error message</li></ul>
             </div>
@@ -380,7 +380,7 @@ class TestFormRendering(TestCase):
                 <input id="id_b" name="b" type="text" />
             </div>
             <div class="required c formField">
-                <label for="id_c">C</label>
+                <label class="required" for="id_c">C</label>
                 <input id="id_c" name="c" type="text" />
             </div>
             """,
@@ -399,17 +399,17 @@ class TestFormRendering(TestCase):
             """
             <fieldset class="formFieldset first">
                 <div class="required a formField">
-                    <label for="id_a">A</label>
+                    <label class="required" for="id_a">A</label>
                     <input id="id_a" name="a" type="text" />
                 </div>
                 <div class="required b formField">
-                    <label for="id_b">B</label>
+                    <label class="required" for="id_b">B</label>
                     <input id="id_b" name="b" type="text" />
                 </div>
             </fieldset>
             <fieldset class="formFieldset second">
                 <div class="required c formField">
-                    <label for="id_c">C</label>
+                    <label class="required" for="id_c">C</label>
                     <input id="id_c" name="c" type="text" />
                 </div>
             </fieldset>
@@ -421,18 +421,18 @@ class TestFormRendering(TestCase):
             """
             <fieldset class="formFieldset first">
                 <div class="required error a formField">
-                    <label for="id_a">A</label>
+                    <label class="required" for="id_a">A</label>
                     <input id="id_a" name="a" type="text" />
                     <ul class="errorlist"><li>this is an error message</li></ul>
                 </div>
                 <div class="required b formField">
-                    <label for="id_b">B</label>
+                    <label class="required" for="id_b">B</label>
                     <input id="id_b" name="b" type="text" />
                 </div>
             </fieldset>
             <fieldset class="formFieldset second">
                 <div class="required c formField">
-                    <label for="id_c">C</label>
+                    <label class="required" for="id_c">C</label>
                     <input id="id_c" name="c" type="text" />
                 </div>
             </fieldset>
@@ -488,17 +488,17 @@ class TestFormRendering(TestCase):
             """
             <fieldset class="formFieldset first">
                 <p class="required">
-                    <label for="id_a">A</label>
+                    <label class="required" for="id_a">A</label>
                     <input id="id_a" name="a" type="text" />
                 </p>
                 <p class="required">
-                    <label for="id_b">B</label>
+                    <label class="required" for="id_b">B</label>
                     <input id="id_b" name="b" type="text" />
                 </p>
             </fieldset>
             <fieldset class="formFieldset second">
                 <p class="required">
-                    <label for="id_c">C</label>
+                    <label class="required" for="id_c">C</label>
                     <input id="id_c" name="c" type="text" />
                 </p>
             </fieldset>
@@ -512,17 +512,17 @@ class TestFormRendering(TestCase):
             <fieldset class="formFieldset first">
                 <p class="required error">
                     <ul class="errorlist"><li>this is an error</li></ul>
-                    <label for="id_a">A</label>
+                    <label class="required" for="id_a">A</label>
                     <input id="id_a" name="a" type="text" />
                 </p>
                 <p class="required">
-                    <label for="id_b">B</label>
+                    <label class="required" for="id_b">B</label>
                     <input id="id_b" name="b" type="text" />
                 </p>
             </fieldset>
             <fieldset class="formFieldset second">
                 <p class="required">
-                    <label for="id_c">C</label>
+                    <label class="required" for="id_c">C</label>
                     <input id="id_c" name="c" type="text" />
                 </p>
             </fieldset>
@@ -550,18 +550,18 @@ class TestFormRendering(TestCase):
             <fieldset class="formFieldset first">
                 <legend>First Fieldset</legend>
                 <p class="required">
-                    <label for="id_a">A</label>
+                    <label class="required" for="id_a">A</label>
                     <input id="id_a" name="a" type="text" />
                 </p>
                 <p class="required">
-                    <label for="id_b">B</label>
+                    <label class="required" for="id_b">B</label>
                     <input id="id_b" name="b" type="text" />
                 </p>
             </fieldset>
             <fieldset class="formFieldset second">
                 <legend>Second Fieldset</legend>
                 <p class="required">
-                    <label for="id_c">C</label>
+                    <label class="required" for="id_c">C</label>
                     <input id="id_c" name="c" type="text" />
                 </p>
             </fieldset>
@@ -579,7 +579,7 @@ class TestFormRendering(TestCase):
             render_to_string('betterforms/form_as_fieldsets.html', env),
             """
             <div class="required prefix-name name formField">
-                <label for="id_prefix-name">Name</label>
+                <label class="required" for="id_prefix-name">Name</label>
                 <input type="text" id="id_prefix-name" name="prefix-name" />
             </div>
             """
