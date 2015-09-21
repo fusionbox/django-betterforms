@@ -6,7 +6,7 @@ __doc__ = """
 App for Django featuring improved form base classes.
 """
 
-version = '1.1.2.dev0'
+version = '1.1.2'
 
 
 def read(fname):
