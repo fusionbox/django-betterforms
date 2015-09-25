@@ -8,7 +8,7 @@
 1.1.2 (2015-09-21)
 ------------------
 
-  - (Buxfix) Mark the output of MultiForm as safe HTML. [Frankie Robertson]
+  - (Bugfix) Mark the output of MultiForm as safe HTML. [Frankie Robertson]
 
 1.1.1 (2014-08-22)
 ------------------
