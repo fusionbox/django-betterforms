@@ -1,21 +1,22 @@
 language: python
 python:
   - "2.7"
-  - "3.3"
+  - "3.4"
+cache: pip
+sudo: false
 env:
-  - DJANGO_PACKAGE=https://github.com/django/django/archive/stable/1.5.x.zip
-  - DJANGO_PACKAGE=https://github.com/django/django/archive/stable/1.6.x.zip
-  - DJANGO_PACKAGE=https://github.com/django/django/archive/stable/1.7.x.zip
-matrix:
-  include:
-    - python: "2.6"
-      env: DJANGO_PACKAGE=https://github.com/django/django/archive/stable/1.4.x.zip
-    - python: "2.7"
-      env: DJANGO_PACKAGE=https://github.com/django/django/archive/stable/1.4.x.zip
+  matrix:
+    - TOX_ENV=py27-dj17
+    - TOX_ENV=py27-dj18
+    - TOX_ENV=py34-dj17
+    - TOX_ENV=py34-dj18
 install:
-  - pip install -q $DJANGO_PACKAGE --use-mirrors
-  - python setup.py install
-  - pip install mock
+  - pip install --upgrade pip
+  - pip install tox
   - pip install coveralls
-script: make coverage
-after_success: cd tests && coveralls
+script:
+  - tox -e $TOX_ENV coverage
+after_success:
+  - coveralls
+after_script:
+  - cat .tox/$TOX_ENV/log/*.log
