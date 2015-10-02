@@ -1,7 +1,10 @@
+import django
 from django.conf.urls import url
 
-# TODO: this was removed in Django 1.8 we should get it from django-formtools
-from django.contrib.formtools.wizard.views import SessionWizardView
+if django.VERSION >= (1, 8):
+    from formtools.wizard.views import SessionWizardView
+else:
+    from django.contrib.formtools.wizard.views import SessionWizardView
 
 from .forms import Step1Form, Step2Form
 
