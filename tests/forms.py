@@ -1,7 +1,4 @@
-try:
-    from collections import OrderedDict
-except ImportError:  # Python 2.6, Django < 1.7
-    from django.utils.datastructures import SortedDict as OrderedDict  # NOQA
+from collections import OrderedDict
 
 from django import forms
 from django.contrib.admin import widgets as admin_widgets

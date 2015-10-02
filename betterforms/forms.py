@@ -1,23 +1,10 @@
 import collections
-try:
-    from collections import Counter
-except ImportError:
-    from collections_compat import Counter  # NOQA
 
 from django import forms
-try:
-    from django.forms.utils import ErrorDict
-except ImportError:
-    # Support Django < 1.7
-    from django.forms.util import ErrorDict
+from django.forms.utils import ErrorDict
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.template.loader import render_to_string
-try:
-    from collections import OrderedDict
-except ImportError:
-    # Support for Python < 2.6
-    from django.utils.datastructures import SortedDict as OrderedDict
-import six  # Django six is buggy with Django < 1.5
+from django.utils import six
 from django.utils.encoding import python_2_unicode_compatible
 
 
@@ -98,7 +85,7 @@ class Fieldset(CSSClassMixin):
         self.legend = kwargs.pop("legend", None)
         # Check for duplicate names.
         names = [str(thing) for thing in self.base_fields]
-        duplicates = [x for x, y in Counter(names).items() if y > 1]
+        duplicates = [x for x, y in collections.Counter(names).items() if y > 1]
         if duplicates:
             raise AttributeError('Name Conflict in fieldset `{0}`.  The name(s) `{1}` appear multiple times.'.format(self.name, duplicates))
         for key, value in six.iteritems(kwargs):
@@ -128,7 +115,7 @@ class BoundFieldset(object):
         self.form = form
         self.name = name
         self.fieldset = fieldset
-        self.rows = OrderedDict()
+        self.rows = collections.OrderedDict()
         for row in fieldset:
             self.rows[six.text_type(row)] = row
 

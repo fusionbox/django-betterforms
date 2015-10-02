@@ -1,17 +1,10 @@
-try:
-    from collections import OrderedDict
-except ImportError:  # Python 2.6, Django < 1.7
-    from django.utils.datastructures import SortedDict as OrderedDict  # NOQA
+from collections import OrderedDict
 
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.views.generic import CreateView
 from django.core import urlresolvers
-
-try:
-    from django.utils.encoding import force_text
-except ImportError:  # Django < 1.5
-    from django.utils.encoding import force_unicode as force_text
+from django.utils.encoding import force_text
 
 from .models import User, Profile, Badge, Book
 from .forms import (

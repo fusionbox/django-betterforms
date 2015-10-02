@@ -4,11 +4,7 @@ from django import forms
 from django.forms.forms import pretty_name
 from django.core.exceptions import ValidationError, ImproperlyConfigured
 from django.db.models import Q
-try:
-    from collections import OrderedDict
-except ImportError:
-    # Support for Python < 2.6
-    from django.utils.datastructures import SortedDict as OrderedDict
+from collections import OrderedDict
 from django.utils import six
 from django.utils.six.moves import reduce
 from django.utils.http import urlencode
