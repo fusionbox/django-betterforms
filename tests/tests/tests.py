@@ -17,7 +17,8 @@ from .models import User, Profile, Badge, Book
 from .forms import (
     UserProfileMultiForm, BadgeMultiForm, ErrorMultiForm,
     MixedForm, NeedsFileField, ManyToManyMultiForm,
-    Step2Form,
+    Step2Form, RaisesErrorCustomCleanMultiform,
+    ModifiesDataCustomCleanMultiform,
 )
 
 
@@ -178,6 +179,40 @@ class MultiFormTest(TestCase):
         # instead of form_list on Django>=1.7 anyway though.
         form_list = list(form_list)
         self.assertEqual(form_list[0]['profile'].cleaned_data['name'], 'John Doe')
+
+    def test_custom_clean_errors(self):
+        form = RaisesErrorCustomCleanMultiform({
+            'user-name': 'foo',
+            'profile-name': 'foo',
+        })
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.cleaned_data, OrderedDict([
+            ('user', {
+                'name': u'foo'
+            }),
+            ('profile', {
+                'name': u'foo',
+                'display_name': u'',
+            })
+        ]))
+        self.assertEqual(form.non_field_errors().as_text(), '* It broke')
+
+    def test_custom_clean_data_change(self):
+        form = ModifiesDataCustomCleanMultiform({
+            'user-name': 'foo',
+            'profile-name': 'foo',
+            'profile-display_name': 'uncleaned name',
+        })
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data, OrderedDict([
+            ('user', {
+                'name': u'foo'
+            }),
+            ('profile', {
+                'name': u'foo',
+                'display_name': u'cleaned name',
+            })
+        ]))
 
 
 class MultiModelFormTest(TestCase):

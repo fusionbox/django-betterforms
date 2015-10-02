@@ -120,3 +120,17 @@ class Step1Form(MultiModelForm):
 
 class Step2Form(forms.Form):
     confirm = forms.BooleanField(required=True)
+
+
+class RaisesErrorCustomCleanMultiform(UserProfileMultiForm):
+    def clean(self):
+        cleaned_data = super(UserProfileMultiForm, self).clean()
+        raise ValidationError('It broke')
+        return cleaned_data
+
+
+class ModifiesDataCustomCleanMultiform(UserProfileMultiForm):
+    def clean(self):
+        cleaned_data = super(UserProfileMultiForm, self).clean()
+        cleaned_data['profile']['display_name'] = "cleaned name"
+        return cleaned_data
