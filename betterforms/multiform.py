@@ -130,7 +130,7 @@ class MultiForm(object):
     def cleaned_data(self):
         return OrderedDict(
             (key, form.cleaned_data)
-            for key, form in self.forms.items()
+            for key, form in self.forms.items() if form.is_valid()
         )
 
 
