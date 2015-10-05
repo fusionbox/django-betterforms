@@ -333,7 +333,6 @@ class TestFormRendering(TestCase):
                 )
         self.TestForm = TestForm
 
-    @unittest.skipIf(django.VERSION < (1, 8), 'HTML output is slightly different in 1.8')
     def test_non_fieldset_form_rendering(self):
         class TestForm(BetterForm):
             # Set the label_suffix to an empty string for consistent results
@@ -351,9 +350,7 @@ class TestFormRendering(TestCase):
             'fieldset_template_name': 'betterforms/fieldset_as_div.html',
             'field_template_name': 'betterforms/field_as_div.html',
         }
-        self.assertHTMLEqual(
-            render_to_string('betterforms/form_as_fieldsets.html', env),
-            """
+        test = """
             <div class="required a formField">
                 <label class="required" for="id_a">A</label>
                 <input id="id_a" name="a" type="text" />
@@ -366,12 +363,15 @@ class TestFormRendering(TestCase):
                 <label class="required" for="id_c">C</label>
                 <input id="id_c" name="c" type="text" />
             </div>
-            """,
-        )
-        form.field_error('a', 'this is an error message')
+            """
+        if django.VERSION < (1, 8):
+            test = test.replace('label class="required"', 'label')
         self.assertHTMLEqual(
             render_to_string('betterforms/form_as_fieldsets.html', env),
-            """
+            test,
+        )
+        form.field_error('a', 'this is an error message')
+        test = """
             <div class="required error a formField">
                 <label class="required" for="id_a">A</label>
                 <input id="id_a" name="a" type="text" />
@@ -385,10 +385,14 @@ class TestFormRendering(TestCase):
                 <label class="required" for="id_c">C</label>
                 <input id="id_c" name="c" type="text" />
             </div>
-            """,
+            """
+        if django.VERSION < (1, 8):
+            test = test.replace('label class="required"', 'label')
+        self.assertHTMLEqual(
+            render_to_string('betterforms/form_as_fieldsets.html', env),
+            test,
         )
 
-    @unittest.skipIf(django.VERSION < (1, 8), 'HTML output is slightly different in 1.8')
     def test_include_tag_rendering(self):
         form = self.TestForm()
         env = {
@@ -397,9 +401,7 @@ class TestFormRendering(TestCase):
             'fieldset_template_name': 'betterforms/fieldset_as_div.html',
             'field_template_name': 'betterforms/field_as_div.html',
         }
-        self.assertHTMLEqual(
-            render_to_string('betterforms/form_as_fieldsets.html', env),
-            """
+        test = """
             <fieldset class="formFieldset first">
                 <div class="required a formField">
                     <label class="required" for="id_a">A</label>
@@ -416,12 +418,15 @@ class TestFormRendering(TestCase):
                     <input id="id_c" name="c" type="text" />
                 </div>
             </fieldset>
-            """,
-        )
-        form.field_error('a', 'this is an error message')
+            """
+        if django.VERSION < (1, 8):
+            test = test.replace('label class="required"', 'label')
         self.assertHTMLEqual(
             render_to_string('betterforms/form_as_fieldsets.html', env),
-            """
+            test,
+        )
+        form.field_error('a', 'this is an error message')
+        test = """
             <fieldset class="formFieldset first">
                 <div class="required error a formField">
                     <label class="required" for="id_a">A</label>
@@ -439,10 +444,14 @@ class TestFormRendering(TestCase):
                     <input id="id_c" name="c" type="text" />
                 </div>
             </fieldset>
-            """,
+            """
+        if django.VERSION < (1, 8):
+            test = test.replace('label class="required"', 'label')
+        self.assertHTMLEqual(
+            render_to_string('betterforms/form_as_fieldsets.html', env),
+            test,
         )
 
-    @unittest.skipIf(django.VERSION < (1, 8), 'HTML output is slightly different in 1.8')
     def test_fields_django_form_required(self):
         class TestForm(forms.Form):
             a = forms.CharField(label='A:')
@@ -456,9 +465,7 @@ class TestFormRendering(TestCase):
             'fieldset_template_name': 'betterforms/fieldset_as_div.html',
             'field_template_name': 'betterforms/field_as_div.html',
         }
-        self.assertHTMLEqual(
-            render_to_string('betterforms/form_as_fieldsets.html', env),
-            """
+        test = """
             <div class="a formField required">
                 <label for="id_a">A:</label>
                 <input id="id_a" name="a" type="text" />
@@ -467,7 +474,12 @@ class TestFormRendering(TestCase):
                 <label for="id_b">B:</label>
                 <input id="id_b" name="b" type="text" />
             </div>
-            """,
+            """
+        if django.VERSION < (1, 8):
+            test = test.replace('label class="required"', 'label')
+        self.assertHTMLEqual(
+            render_to_string('betterforms/form_as_fieldsets.html', env),
+            test,
         )
 
     @unittest.expectedFailure
@@ -485,12 +497,9 @@ class TestFormRendering(TestCase):
         form = self.TestForm()
         form.as_ul()
 
-    @unittest.skipIf(django.VERSION < (1, 8), 'HTML output is slightly different in 1.8')
     def test_form_as_p(self):
         form = self.TestForm()
-        self.assertHTMLEqual(
-            form.as_p(),
-            """
+        test = """
             <fieldset class="formFieldset first">
                 <p class="required">
                     <label class="required" for="id_a">A</label>
@@ -507,13 +516,16 @@ class TestFormRendering(TestCase):
                     <input id="id_c" name="c" type="text" />
                 </p>
             </fieldset>
-            """,
+            """
+        if django.VERSION < (1, 8):
+            test = test.replace('label class="required"', 'label')
+        self.assertHTMLEqual(
+            form.as_p(),
+            test,
         )
 
         form.field_error('a', 'this is an error')
-        self.assertHTMLEqual(
-            form.as_p(),
-            """
+        test = """
             <fieldset class="formFieldset first">
                 <p class="required error">
                     <ul class="errorlist"><li>this is an error</li></ul>
@@ -531,10 +543,14 @@ class TestFormRendering(TestCase):
                     <input id="id_c" name="c" type="text" />
                 </p>
             </fieldset>
-            """,
+            """
+        if django.VERSION < (1, 8):
+            test = test.replace('label class="required"', 'label')
+        self.assertHTMLEqual(
+            form.as_p(),
+            test,
         )
 
-    @unittest.skipIf(django.VERSION < (1, 8), 'HTML output is slightly different in 1.8')
     def test_fieldset_legend(self):
         class TestForm(BetterForm):
             a = forms.CharField()
@@ -550,9 +566,7 @@ class TestFormRendering(TestCase):
                 )
 
         form = TestForm()
-        self.assertHTMLEqual(
-            form.as_p(),
-            """
+        test = """
             <fieldset class="formFieldset first">
                 <legend>First Fieldset</legend>
                 <p class="required">
@@ -571,10 +585,14 @@ class TestFormRendering(TestCase):
                     <input id="id_c" name="c" type="text" />
                 </p>
             </fieldset>
-            """,
+            """
+        if django.VERSION < (1, 8):
+            test = test.replace('label class="required"', 'label')
+        self.assertHTMLEqual(
+            form.as_p(),
+            test,
         )
 
-    @unittest.skipIf(django.VERSION < (1, 8), 'HTML output is slightly different in 1.8')
     def test_css_classes_when_form_has_prefix(self):
         class TestForm(BetterForm):
             name = forms.CharField()
@@ -582,14 +600,17 @@ class TestFormRendering(TestCase):
 
         form = TestForm(prefix="prefix")
         env = {'form': form, 'no_head': True}
-        self.assertHTMLEqual(
-            render_to_string('betterforms/form_as_fieldsets.html', env),
-            """
+        test = """
             <div class="required prefix-name name formField">
                 <label class="required" for="id_prefix-name">Name</label>
                 <input type="text" id="id_prefix-name" name="prefix-name" />
             </div>
             """
+        if django.VERSION < (1, 8):
+            test = test.replace('label class="required"', 'label')
+        self.assertHTMLEqual(
+            render_to_string('betterforms/form_as_fieldsets.html', env),
+            test,
         )
 
 
