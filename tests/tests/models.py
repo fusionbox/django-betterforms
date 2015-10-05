@@ -24,3 +24,8 @@ class Author(models.Model):
 
 class Book(models.Model):
     name = models.CharField(max_length=255)
+
+
+class BookImage(models.Model):
+    book = models.ForeignKey(Book, related_name='images')
+    name = models.CharField(max_length=255)

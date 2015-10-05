@@ -4,12 +4,13 @@ except ImportError:  # Python 2.6, Django < 1.7
     from django.utils.datastructures import SortedDict as OrderedDict  # NOQA
 
 from django import forms
+from django.forms.models import inlineformset_factory
 from django.contrib.admin import widgets as admin_widgets
 from django.core.exceptions import ValidationError
 
 from betterforms.multiform import MultiForm, MultiModelForm
 
-from .models import User, Profile, Badge, Author
+from .models import User, Profile, Badge, Author, Book, BookImage
 
 
 class UserForm(forms.ModelForm):
@@ -120,3 +121,29 @@ class Step1Form(MultiModelForm):
 
 class Step2Form(forms.Form):
     confirm = forms.BooleanField(required=True)
+
+
+class BookForm(forms.ModelForm):
+    class Meta:
+        model = Book
+        fields = ('name',)
+
+
+BookImageFormSet = inlineformset_factory(Book, BookImage, fields=('name',))
+
+
+class BookMultiForm(MultiModelForm):
+    form_classes = {
+        'book': BookForm,
+        'error': RaisesErrorForm,
+        'images': BookImageFormSet,
+    }
+
+    def __init__(self, *args, **kwargs):
+        instance = kwargs.pop('instance', None)
+        if instance is not None:
+            kwargs['instance'] = {
+                'book': instance,
+                'images': instance,
+            }
+        super(BookMultiForm, self).__init__(*args, **kwargs)

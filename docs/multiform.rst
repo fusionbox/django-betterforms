@@ -342,6 +342,21 @@ API Reference
 
     .. method:: non_field_errors
 
+        .. note::
+
+            :class:`FormSets <django:django.forms.formsets.BaseFormSet>` do not
+            provide :meth:`non_field_errors`, they provide
+            :meth:`non_form_errors() <django:django.forms.formsets.BaseFormSet.non_form_errors>`,
+            if you put a :class:`FormSet
+            <django:django.forms.formsets.BaseFormSet>` in your
+            :attr:`form_classes`, the output of :meth:`non_field_errors` **does
+            not** include the
+            :meth:`non_form_errors() <django:django.forms.formsets.BaseFormSet.non_form_errors>`,
+            from the formset, you will
+            need to call
+            :meth:`non_form_errors() <django:django.forms.formsets.BaseFormSet.non_form_errors>`,
+            yourself.
+
     .. method:: as_table
 
     .. method:: as_ul
