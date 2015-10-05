@@ -7,3 +7,5 @@ tests/.coverage
 tests/htmlcov/
 dist/
 .tox/
+.cache/
+.coverage

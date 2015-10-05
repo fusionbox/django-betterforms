@@ -11,6 +11,7 @@ try:
 except ImportError:  # Django < 1.7
     from django.forms.util import ErrorDict, ErrorList  # NOQA
 
+from django.core.exceptions import ValidationError
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.safestring import mark_safe
 from django.utils.six.moves import reduce
@@ -38,6 +39,7 @@ class MultiForm(object):
         if self.initials is None:
             self.initials = {}
         self.forms = OrderedDict()
+        self.crossform_errors = []
 
         for key, form_class in self.form_classes.items():
             fargs, fkwargs = self.get_form_args_kwargs(key, args, kwargs)
@@ -73,15 +75,35 @@ class MultiForm(object):
     def is_bound(self):
         return any(form.is_bound for form in self.forms.values())
 
+    def clean(self):
+        """
+        Raises any ValidationErrors required for cross form validation. Should
+        return a dict of cleaned_data objects for any forms whose data should
+        be overridden.
+        """
+        return self.cleaned_data
+
+    def add_crossform_error(self, e):
+        self.crossform_errors.append(e)
+
     def is_valid(self):
-        return all(form.is_valid() for form in self.forms.values())
+        forms_valid = all(form.is_valid() for form in self.forms.values())
+        try:
+            cleaned_data = self.clean()
+        except ValidationError as e:
+            self.add_crossform_error(e)
+        else:
+            if cleaned_data is not None:
+                for key, data in cleaned_data.items():
+                    self.forms[key].cleaned_data = data
+        return forms_valid and not self.crossform_errors
 
     def non_field_errors(self):
-        return ErrorList(chain.from_iterable(
+        form_errors = (
             form.non_field_errors() for form in self.forms.values()
-            # FormSets don't have non_field_errors errors
             if hasattr(form, 'non_field_errors')
-        ))
+        )
+        return ErrorList(chain(self.crossform_errors, *form_errors))
 
     def as_table(self):
         return mark_safe(''.join(form.as_table() for form in self.forms.values()))
@@ -111,7 +133,7 @@ class MultiForm(object):
     def cleaned_data(self):
         return OrderedDict(
             (key, form.cleaned_data)
-            for key, form in self.forms.items()
+            for key, form in self.forms.items() if form.is_valid()
         )
 
 

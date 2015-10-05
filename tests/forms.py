@@ -1,7 +1,4 @@
-try:
-    from collections import OrderedDict
-except ImportError:  # Python 2.6, Django < 1.7
-    from django.utils.datastructures import SortedDict as OrderedDict  # NOQA
+from collections import OrderedDict
 
 from django import forms
 from django.forms.models import inlineformset_factory
@@ -147,3 +144,17 @@ class BookMultiForm(MultiModelForm):
                 'images': instance,
             }
         super(BookMultiForm, self).__init__(*args, **kwargs)
+
+
+class RaisesErrorCustomCleanMultiform(UserProfileMultiForm):
+    def clean(self):
+        cleaned_data = super(UserProfileMultiForm, self).clean()
+        raise ValidationError('It broke')
+        return cleaned_data
+
+
+class ModifiesDataCustomCleanMultiform(UserProfileMultiForm):
+    def clean(self):
+        cleaned_data = super(UserProfileMultiForm, self).clean()
+        cleaned_data['profile']['display_name'] = "cleaned name"
+        return cleaned_data
