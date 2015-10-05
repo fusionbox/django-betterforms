@@ -60,6 +60,21 @@ use an OrderedDict to define the :attr:`~MultiForm.form_classes`. ::
             ('profile', ProfileForm),
         ))
 
+You can also use :attr:`~MultiForm.field_order` to reorder the fields of the
+subforms, offering the possibility of intertwining fields from separate
+subforms. For example::
+
+    class UserProfileMultiForm(MultiForm):
+        form_classes = {
+            'user': UserForm,
+            'profile': ProfileForm,
+        }
+        field_order = (
+            ('user', 'name'),
+            ('profile', '__all__'),
+            ('user', 'email'),
+        )
+
 
 Working with ModelForms
 -----------------------
@@ -315,6 +330,13 @@ API Reference
         This is a dictionary of form name, form class pairs.  If the order of
         the forms is important (for example for output), you can use an
         OrderedDict instead of a plain dictionary.
+
+    .. attribute:: field_order
+
+        This is a iterable of form name, field name pairs which
+        specify how the fields should be ordered in the output. The special
+        field name ``'__all__'`` is supported, which is equivalent to all the
+        fields from a subform in their original order.
 
     .. method:: get_form_args_kwargs(key, args, kwargs)
 

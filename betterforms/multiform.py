@@ -6,6 +6,8 @@ try:
 except ImportError:  # Python 2.6, Django < 1.7
     from django.utils.datastructures import SortedDict as OrderedDict  # NOQA
 
+from django.forms import BaseForm
+
 try:
     from django.forms.utils import ErrorDict, ErrorList
 except ImportError:  # Django < 1.7
@@ -14,10 +16,43 @@ except ImportError:  # Django < 1.7
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.safestring import mark_safe
 from django.utils.six.moves import reduce
+from django.utils.six import string_types
 
 
 @python_2_unicode_compatible
-class MultiForm(object):
+class WhitelistedBaseForm(object):
+    """
+    If MultiForm inherited directly from django.forms.BaseForm, it may appear
+    to have functionality that hasn't actually be implemented correctly,
+    resulting in methods and properties having to be deleted.
+
+    This baseclass copies methods and properties from BaseForm related to html
+    output from BaseForm's __dict__, ensuring we're in control of MultiForm's
+    interface.
+    """
+
+    def __init__(self, auto_id='id_%s', prefix=None, error_class=ErrorList,
+                 label_suffix=':', *args, **kwargs):
+        self.auto_id = auto_id
+        self.prefix = prefix
+        self.error_class = error_class
+        self.label_suffix = label_suffix
+
+    def __str__(self):
+        return self.as_table()
+
+    if '__repr__' in BaseForm.__dict__: # For Django < 1.7
+        __repr__ = BaseForm.__dict__['__repr__']
+    __iter__ = BaseForm.__dict__['__iter__']
+    add_prefix = BaseForm.__dict__['add_prefix']
+    add_initial_prefix = BaseForm.__dict__['add_initial_prefix']
+    _html_output = BaseForm.__dict__['_html_output']
+    as_table = BaseForm.__dict__['as_table']
+    as_ul = BaseForm.__dict__['as_ul']
+    as_p = BaseForm.__dict__['as_p']
+
+
+class MultiForm(WhitelistedBaseForm):
     """
     A container that allows you to treat multiple forms as one form.  This is
     great for using more than one form on a page that share the same submit
@@ -25,6 +60,7 @@ class MultiForm(object):
     else that you are using a MultiForm.
     """
     form_classes = {}
+    field_order = None
 
     def __init__(self, data=None, files=None, *args, **kwargs):
         # Some things, such as the WizardView expect these to exist.
@@ -34,6 +70,8 @@ class MultiForm(object):
             files=files,
         )
 
+        super(MultiForm, self).__init__(*args, **kwargs)
+
         self.initials = kwargs.pop('initial', None)
         if self.initials is None:
             self.initials = {}
@@ -42,6 +80,34 @@ class MultiForm(object):
         for key, form_class in self.form_classes.items():
             fargs, fkwargs = self.get_form_args_kwargs(key, args, kwargs)
             self.forms[key] = form_class(*fargs, **fkwargs)
+
+        self.fields = OrderedDict()
+        for key, form in self.forms.items():
+            for name, field in form.fields.items():
+                self.fields[(key, name)] = field
+
+        self.order_fields(self.field_order)
+
+    def order_fields(self, field_order):
+        if field_order is None:
+            return
+        fields = OrderedDict()
+
+        def add_field(key, name):
+            full_name = (key, name)
+            try:
+                fields[full_name] = self.fields.pop(full_name)
+            except KeyError:  # ignore unknown fields
+                pass
+
+        for key, name in field_order:
+            if name == '__all__':
+                for name in self[key].fields:
+                    add_field(key, name)
+            else:
+                add_field(key, name)
+        fields.update(self.fields)  # add remaining fields in original order
+        self.fields = fields
 
     def get_form_args_kwargs(self, key, args, kwargs):
         """
@@ -59,15 +125,12 @@ class MultiForm(object):
         )
         return args, fkwargs
 
-    def __str__(self):
-        return self.as_table()
-
     def __getitem__(self, key):
-        return self.forms[key]
-
-    def __iter__(self):
-        # TODO: Should the order of the fields be controllable from here?
-        return chain.from_iterable(self.forms.values())
+        if isinstance(key, string_types):
+            return self.forms[key]
+        else:
+            key, name = key
+            return self.forms[key][name]
 
     @property
     def is_bound(self):
@@ -80,15 +143,6 @@ class MultiForm(object):
         return ErrorList(chain.from_iterable(
             form.non_field_errors() for form in self.forms.values()
         ))
-
-    def as_table(self):
-        return mark_safe(''.join(form.as_table() for form in self.forms.values()))
-
-    def as_ul(self):
-        return mark_safe(''.join(form.as_ul() for form in self.forms.values()))
-
-    def as_p(self):
-        return mark_safe(''.join(form.as_p() for form in self.forms.values()))
 
     def is_multipart(self):
         return any(form.is_multipart() for form in self.forms.values())

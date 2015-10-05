@@ -27,6 +27,7 @@ setup(
     ],
     tests_require=[
         'mock>=1.0.1',
+        'lxml>=3.4.4',
     ],
     zip_safe=False,
     include_package_data=True,

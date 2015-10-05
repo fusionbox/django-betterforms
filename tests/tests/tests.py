@@ -17,7 +17,7 @@ from .models import User, Profile, Badge, Book
 from .forms import (
     UserProfileMultiForm, BadgeMultiForm, ErrorMultiForm,
     MixedForm, NeedsFileField, ManyToManyMultiForm,
-    Step2Form,
+    Step2Form, ReorderedForm
 )
 
 
@@ -51,7 +51,7 @@ class MultiFormTest(TestCase):
         form = UserProfileMultiForm()
         user_table = form['user'].as_table()
         profile_table = form['profile'].as_table()
-        self.assertEqual(form.as_table(), user_table + profile_table)
+        self.assertHTMLEqual(form.as_table(), user_table + ' ' + profile_table)
 
     def test_to_str_is_as_table(self):
         form = UserProfileMultiForm()
@@ -61,13 +61,13 @@ class MultiFormTest(TestCase):
         form = UserProfileMultiForm()
         user_ul = form['user'].as_ul()
         profile_ul = form['profile'].as_ul()
-        self.assertEqual(form.as_ul(), user_ul + profile_ul)
+        self.assertHTMLEqual(form.as_ul(), user_ul + ' ' + profile_ul)
 
     def test_as_p(self):
         form = UserProfileMultiForm()
         user_p = form['user'].as_p()
         profile_p = form['profile'].as_p()
-        self.assertEqual(form.as_p(), user_p + profile_p)
+        self.assertHTMLEqual(form.as_p(), user_p + ' ' + profile_p)
 
     def test_is_not_valid(self):
         form = UserProfileMultiForm({
@@ -178,6 +178,15 @@ class MultiFormTest(TestCase):
         # instead of form_list on Django>=1.7 anyway though.
         form_list = list(form_list)
         self.assertEqual(form_list[0]['profile'].cleaned_data['name'], 'John Doe')
+
+    def test_reordered_form(self):
+        form = ReorderedForm()
+        fields = [field.field for field in form]
+        self.assertEqual(fields, [
+            form['profile'].fields['name'],
+            form['myfile'].fields['myfile'],
+            form['profile'].fields['display_name'],
+        ])
 
 
 class MultiModelFormTest(TestCase):

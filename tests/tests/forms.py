@@ -118,5 +118,17 @@ class Step1Form(MultiModelForm):
     }
 
 
+class ReorderedForm(MultiModelForm):
+    form_classes = OrderedDict([
+        ('myfile', OptionalFileForm),
+        ('profile', ProfileForm),
+    ])
+    field_order = [
+        ('profile', 'name'),
+        ('myfile', '__all__'),
+        ('profile', 'display_name'),
+    ]
+
+
 class Step2Form(forms.Form):
     confirm = forms.BooleanField(required=True)
