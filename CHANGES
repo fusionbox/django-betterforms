@@ -3,6 +3,8 @@
 
  - (Bugfix) Help text is not HTML-escaped anymore in Django 1.8
     - <https://docs.djangoproject.com/en/1.8/ref/models/fields/#django.db.models.Field.help_text>
+ - Remove support for Django 1.5 and 1.6.
+ - Add support for Multiform crossform validation [Julian Andrews, #35].
 
 
 1.1.2 (2015-09-21)
