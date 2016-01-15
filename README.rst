@@ -9,7 +9,7 @@ django-betterforms
    :target: http://coveralls.io/r/fusionbox/django-betterforms
    :alt: Build Status
 
-`django-betterforms` builds on the build in django forms.
+`django-betterforms` builds on the built-in django forms.
 
 
 Installation
