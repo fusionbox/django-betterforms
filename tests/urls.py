@@ -5,13 +5,14 @@ if django.VERSION >= (1, 8):
     from formtools.wizard.views import SessionWizardView
 else:
     from django.contrib.formtools.wizard.views import SessionWizardView
+from django.core.files.storage import FileSystemStorage
 
 from .forms import Step1Form, Step2Form
 
 
-class TestWizardView(SessionWizardView):
+class TestInvalidWizardView(SessionWizardView):
     def get_context_data(self, **kwargs):
-        kwargs = super(TestWizardView, self).get_context_data(**kwargs)
+        kwargs = super(TestInvalidWizardView, self).get_context_data(**kwargs)
         # Django < 1.5 does not set the view object in the context
         kwargs['view'] = self
         return kwargs
@@ -21,6 +22,10 @@ class TestWizardView(SessionWizardView):
             'form_list': form_list,
         }
         return self.render_to_response(context)
+
+
+class TestWizardView(TestInvalidWizardView):
+    file_storage = FileSystemStorage(location='/tmp/')
 
 
 urlpatterns = [

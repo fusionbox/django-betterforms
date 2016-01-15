@@ -105,11 +105,6 @@ class OptionalFileForm(forms.Form):
 
 
 class Step1Form(MultiModelForm):
-    # This is required because the WizardView introspects it, but we don't have
-    # a way of determining this dynamically, so just set it to an empty
-    # dictionary.
-    base_fields = {}
-
     form_classes = {
         'myfile': OptionalFileForm,
         'profile': ProfileForm,

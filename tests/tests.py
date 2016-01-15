@@ -5,14 +5,16 @@ from django.test.client import RequestFactory
 from django.views.generic import CreateView
 from django.core import urlresolvers
 from django.utils.encoding import force_text
+from django.contrib.formtools.wizard.storage.exceptions import \
+        NoFileStorageConfigured
 
 from .models import User, Profile, Badge, Book
 from .forms import (
-    UserProfileMultiForm, BadgeMultiForm, ErrorMultiForm,
-    MixedForm, NeedsFileField, ManyToManyMultiForm, Step2Form,
-    BookMultiForm, RaisesErrorCustomCleanMultiform,
-    ModifiesDataCustomCleanMultiform,
+    UserProfileMultiForm, BadgeMultiForm, ErrorMultiForm, MixedForm,
+    NeedsFileField, ManyToManyMultiForm, Step1Form, Step2Form, BookMultiForm,
+    RaisesErrorCustomCleanMultiform, ModifiesDataCustomCleanMultiform,
 )
+from .urls import TestInvalidWizardView
 
 
 class MultiFormTest(TestCase):
@@ -151,10 +153,12 @@ class MultiFormTest(TestCase):
         # Used to throw an AttributeError
         UserProfileMultiForm(initial=None)
 
+    def test_wizard_view_raises_file_no_storage(self):
+        with self.assertRaises(NoFileStorageConfigured):
+            TestInvalidWizardView.as_view([Step1Form, Step2Form])
+
     def test_works_with_wizard_view(self):
         url = urlresolvers.reverse('test_wizard')
-        self.client.get(url)
-
         response = self.client.post(url, {
             'test_wizard_view-current_step': '0',
             'profile__0-name': 'John Doe',
