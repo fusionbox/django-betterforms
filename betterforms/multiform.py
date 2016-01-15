@@ -136,6 +136,11 @@ class MultiForm(object):
             for key, form in self.forms.items() if form.is_valid()
         )
 
+    @cleaned_data.setter
+    def cleaned_data(self, data):
+        for key, value in data.items():
+            self.forms[key].cleaned_data = value
+
 
 class MultiModelForm(MultiForm):
     """
