@@ -89,13 +89,9 @@ class MultiForm(object):
     def is_valid(self):
         forms_valid = all(form.is_valid() for form in self.forms.values())
         try:
-            cleaned_data = self.clean()
+            self.cleaned_data = self.clean()
         except ValidationError as e:
             self.add_crossform_error(e)
-        else:
-            if cleaned_data is not None:
-                for key, data in cleaned_data.items():
-                    self.forms[key].cleaned_data = data
         return forms_valid and not self.crossform_errors
 
     def non_field_errors(self):
@@ -139,7 +135,12 @@ class MultiForm(object):
     @cleaned_data.setter
     def cleaned_data(self, data):
         for key, value in data.items():
-            self.forms[key].cleaned_data = value
+            child_form = self[key]
+            if hasattr(child_form, 'forms'):
+                for formlet, formlet_data in zip(child_form.forms, value):
+                    formlet.cleaned_data = formlet_data
+            else:
+                child_form.cleaned_data = value
 
 
 class MultiModelForm(MultiForm):

@@ -8,9 +8,9 @@ from django.utils.encoding import force_text
 
 from .models import User, Profile, Badge, Book
 from .forms import (
-    UserProfileMultiForm, BadgeMultiForm, ErrorMultiForm,
-    MixedForm, NeedsFileField, ManyToManyMultiForm, Step2Form,
-    BookMultiForm, RaisesErrorCustomCleanMultiform,
+    UserProfileMultiForm, BadgeMultiForm, ErrorMultiForm, MixedForm,
+    NeedsFileField, ManyToManyMultiForm, RaisesErrorBookMultiForm,
+    CleanedBookMultiForm, BookMultiForm, RaisesErrorCustomCleanMultiform,
     ModifiesDataCustomCleanMultiform,
 )
 
@@ -297,8 +297,33 @@ class MultiModelFormTest(TestCase):
         self.assertEqual(resp.status_code, 302)
         self.assertEqual(Badge.objects.count(), 2)
 
-    def test_non_field_errors_with_formset(self):
+    def test_is_valid_with_formset(self):
         form = BookMultiForm({
+            'book-name': 'Test',
+            'images-0-name': 'One',
+            'images-1-name': 'Two',
+            'images-TOTAL_FORMS': '3',
+            'images-INITIAL_FORMS': '0',
+            'images-MAX_NUM_FORMS': '1000',
+        })
+        assert form.is_valid()
+
+    def test_override_clean(self):
+        form = CleanedBookMultiForm({
+            'book-name': 'Test',
+            'images-0-name': 'One',
+            'images-1-name': 'Two',
+            'images-TOTAL_FORMS': '3',
+            'images-INITIAL_FORMS': '0',
+            'images-MAX_NUM_FORMS': '1000',
+        })
+        assert form.is_valid()
+        assert form['book'].cleaned_data['name'] == 'Overridden'
+        assert form['images'].forms[0].cleaned_data['name'] == 'Two'
+        assert form['images'].forms[1].cleaned_data['name'] == 'Three'
+
+    def test_non_field_errors_with_formset(self):
+        form = RaisesErrorBookMultiForm({
             'book-name': '',
             'images-0-name': '',
             'images-TOTAL_FORMS': '3',
