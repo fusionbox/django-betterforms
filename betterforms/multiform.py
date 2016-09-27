@@ -11,7 +11,7 @@ try:
 except ImportError:  # Django < 1.7
     from django.forms.util import ErrorDict, ErrorList  # NOQA
 
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.safestring import mark_safe
 from django.utils.six.moves import reduce
@@ -66,6 +66,26 @@ class MultiForm(object):
 
     def __getitem__(self, key):
         return self.forms[key]
+
+    @property
+    def errors(self):
+        errors = {}
+        for form_name in self.forms:
+            form = self.forms[form_name]
+            for field_name in form.errors:
+                errors[form.add_prefix(field_name)] = form.errors[field_name]
+        if self.crossform_errors:
+            errors[NON_FIELD_ERRORS] = self.crossform_errors
+        return errors
+
+    @property
+    def fields(self):
+        fields = []
+        for form_name in self.forms:
+            form = self.forms[form_name]
+            for field_name in form.fields:
+                fields += [form.add_prefix(field_name)]
+        return fields
 
     def __iter__(self):
         # TODO: Should the order of the fields be controllable from here?

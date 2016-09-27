@@ -47,6 +47,19 @@ class MultiFormTest(TestCase):
         profile_table = form['profile'].as_table()
         self.assertEqual(form.as_table(), user_table + profile_table)
 
+    def test_fields(self):
+        form = UserProfileMultiForm()
+        self.assertEqual(form.fields, ['user-name', 'profile-name', 'profile-display_name'])
+
+    def test_errors(self):
+        form = ErrorMultiForm()
+        self.assertEqual(form.errors, {})
+
+    def test_errors_crossform(self):
+        form = ErrorMultiForm()
+        form.add_crossform_error("Error")
+        self.assertEqual(form.errors, {'__all__': ['Error']})
+
     def test_to_str_is_as_table(self):
         form = UserProfileMultiForm()
         self.assertEqual(force_text(form), form.as_table())
