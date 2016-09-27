@@ -1,21 +1,29 @@
 language: python
 python:
   - "2.7"
-  - "3.4"
+  - "3.5"
 cache: pip
 sudo: false
 env:
   matrix:
-    - TOX_ENV=py27-dj17
-    - TOX_ENV=py27-dj18
-    - TOX_ENV=py34-dj17
-    - TOX_ENV=py34-dj18
+    - TOX_ENV=dj17
+    - TOX_ENV=dj18
+    - TOX_ENV=dj19
+    - TOX_ENV=dj110
+    - TOX_ENV=djdev
+matrix:
+   exclude:
+      - python: "3.5"
+        env: TOX_ENV=dj17
+   allow_failures:
+      - env: TOX_ENV=djdev
+
 install:
   - pip install --upgrade pip
   - pip install tox
   - pip install coveralls
 script:
-  - tox -e $TOX_ENV coverage
+  - tox -e py${TRAVIS_PYTHON_VERSION/./}-$TOX_ENV coverage
 after_success:
   - coveralls
 after_script:

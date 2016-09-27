@@ -1,5 +1,6 @@
 from collections import OrderedDict
 
+import django
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.views.generic import CreateView
@@ -107,9 +108,12 @@ class MultiFormTest(TestCase):
 
     def test_media(self):
         form = NeedsFileField()
+        static_prefix = ""
+        if django.VERSION < (1, 10):
+            static_prefix = "/static/"
         self.assertEqual(form.media._js, [
-            '/static/admin/js/calendar.js',
-            '/static/admin/js/admin/DateTimeShortcuts.js',
+            static_prefix + 'admin/js/calendar.js',
+            static_prefix + 'admin/js/admin/DateTimeShortcuts.js',
             'test.js',
         ])
 
