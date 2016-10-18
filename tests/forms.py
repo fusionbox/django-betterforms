@@ -132,7 +132,6 @@ BookImageFormSet = inlineformset_factory(Book, BookImage, fields=('name',))
 class BookMultiForm(MultiModelForm):
     form_classes = {
         'book': BookForm,
-        'error': RaisesErrorForm,
         'images': BookImageFormSet,
     }
 
@@ -144,6 +143,38 @@ class BookMultiForm(MultiModelForm):
                 'images': instance,
             }
         super(BookMultiForm, self).__init__(*args, **kwargs)
+
+
+class RaisesErrorBookMultiForm(BookMultiForm):
+    form_classes = {
+        'book': BookForm,
+        'error': RaisesErrorForm,
+        'images': BookImageFormSet,
+    }
+
+
+class CleanedBookMultiForm(BookMultiForm):
+    def clean(self):
+        book = self.cleaned_data['images'][0]['book']
+        return {
+            'images': [
+                {
+                    'name': 'Two',
+                    'book': book,
+                    'id': None,
+                    'DELETE': False,
+                },
+                {
+                    'name': 'Three',
+                    'book': book,
+                    'id': None,
+                    'DELETE': False,
+                },
+            ],
+            'book': {
+                'name': 'Overridden',
+            },
+        }
 
 
 class RaisesErrorCustomCleanMultiform(UserProfileMultiForm):
