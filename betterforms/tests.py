@@ -613,6 +613,23 @@ class TestFormRendering(TestCase):
             test,
         )
 
+    def test_css_classes_when_form_has_prefix(self):
+        class TestForm(BetterForm):
+            name = forms.CharField()
+            label_suffix = ''
+
+        form = TestForm(prefix="prefix")
+        env = {'form': form, 'no_head': True}
+        self.assertHTMLEqual(
+            render_to_string('betterforms/form_as_fieldsets.html', env),
+            """
+            <div class="required prefix-name name formField">
+                <label for="id_prefix-name">Name</label>
+                <input type="text" id="id_prefix-name" name="prefix-name" />
+            </div>
+            """
+        )
+
 
 class ChangeListModel(models.Model):
     field_a = models.CharField(max_length=255)
