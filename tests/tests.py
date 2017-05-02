@@ -1,5 +1,6 @@
 from collections import OrderedDict
 
+import django
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.views.generic import CreateView
@@ -46,6 +47,19 @@ class MultiFormTest(TestCase):
         user_table = form['user'].as_table()
         profile_table = form['profile'].as_table()
         self.assertEqual(form.as_table(), user_table + profile_table)
+
+    def test_fields(self):
+        form = UserProfileMultiForm()
+        self.assertEqual(form.fields, ['user-name', 'profile-name', 'profile-display_name'])
+
+    def test_errors(self):
+        form = ErrorMultiForm()
+        self.assertEqual(form.errors, {})
+
+    def test_errors_crossform(self):
+        form = ErrorMultiForm()
+        form.add_crossform_error("Error")
+        self.assertEqual(form.errors, {'__all__': ['Error']})
 
     def test_to_str_is_as_table(self):
         form = UserProfileMultiForm()
@@ -94,9 +108,12 @@ class MultiFormTest(TestCase):
 
     def test_media(self):
         form = NeedsFileField()
+        static_prefix = ""
+        if django.VERSION < (1, 10):
+            static_prefix = "/static/"
         self.assertEqual(form.media._js, [
-            '/static/admin/js/calendar.js',
-            '/static/admin/js/admin/DateTimeShortcuts.js',
+            static_prefix + 'admin/js/calendar.js',
+            static_prefix + 'admin/js/admin/DateTimeShortcuts.js',
             'test.js',
         ])
 

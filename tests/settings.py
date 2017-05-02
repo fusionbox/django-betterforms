@@ -12,6 +12,16 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
 )
 
+TEMPLATES = [
+    {
+		'DIRS': [
+			os.path.join(PROJECT_PATH, 'templates/'),
+		],
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'APP_DIRS': True,
+    },
+]
+
 INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.contenttypes',
