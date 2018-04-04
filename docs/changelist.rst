@@ -25,7 +25,7 @@ functionality that deals with operations on lists of model instances.
     a model.  This form adds a field to the model ``q`` for the search query.
 
    .. attribute:: SEARCH_FIELDS
-    
+
      The list of fields that will be searched against.
 
    .. attribute:: CASE_SENSITIVE
@@ -39,7 +39,7 @@ functionality that deals with operations on lists of model instances.
 
        # my_app/forms.py
        from django.contrib.auth.models import get_user_model
-       from betterforms.forms import SearchForm
+       from betterforms.changelist import SearchForm
 
        class UserSearchForm(SearchForm):
            SEARCH_FIELDS = ('username', 'email', 'name')
