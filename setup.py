@@ -23,13 +23,12 @@ setup(
     author_email='programmers@fusionbox.com',
     packages=[package for package in find_packages()
               if package.startswith('betterforms')],
-    install_requires=['Django>=1.7'],
+    install_requires=['Django>=1.8'],
     zip_safe=False,
     include_package_data=True,
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Framework :: Django',
-        'Framework :: Django :: 1.7',
         'Framework :: Django :: 1.8',
         'Framework :: Django :: 1.9',
         'Framework :: Django :: 1.10',
