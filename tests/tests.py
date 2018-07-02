@@ -3,10 +3,6 @@ from collections import OrderedDict
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.views.generic import CreateView
-try:
-    from django.urls import reverse
-except ImportError:
-    from django.core.urlresolvers import reverse
 from django.utils.encoding import force_text
 
 from .models import User, Profile, Badge, Book
@@ -16,6 +12,11 @@ from .forms import (
     CleanedBookMultiForm, BookMultiForm, RaisesErrorCustomCleanMultiform,
     ModifiesDataCustomCleanMultiform,
 )
+
+try:
+    from django.urls import reverse
+except ImportError:  # Django 1.9 and earlier
+    from django.core.urlresolvers import reverse
 
 
 class MultiFormTest(TestCase):
@@ -52,7 +53,9 @@ class MultiFormTest(TestCase):
 
     def test_fields(self):
         form = UserProfileMultiForm()
-        self.assertEqual(form.fields, ['user-name', 'profile-name', 'profile-display_name'])
+        self.assertEqual(form.fields, [
+            'user-name', 'profile-name', 'profile-display_name'
+        ])
 
     def test_errors(self):
         form = ErrorMultiForm()
@@ -99,7 +102,8 @@ class MultiFormTest(TestCase):
         form = ErrorMultiForm(data={})
 
         self.assertFalse(form.is_valid())
-        self.assertEqual(form.non_field_errors().as_text(), '* It broke\n* It broke')
+        self.assertEqual(form.non_field_errors().as_text(),
+                         '* It broke\n* It broke')
 
     def test_is_multipart(self):
         form1 = ErrorMultiForm()
@@ -183,7 +187,8 @@ class MultiFormTest(TestCase):
         # support indexing, you are probably recommending to use form_dict
         # instead of form_list on Django>=1.7 anyway though.
         form_list = list(form_list)
-        self.assertEqual(form_list[0]['profile'].cleaned_data['name'], 'John Doe')
+        self.assertEqual(form_list[0]['profile'].cleaned_data['name'],
+                         'John Doe')
 
     def test_custom_clean_errors(self):
         form = RaisesErrorCustomCleanMultiform({
