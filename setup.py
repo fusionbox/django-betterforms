@@ -25,9 +25,6 @@ setup(
         'Django>=1.4',
         'six',
     ],
-    tests_require=[
-        'mock>=1.0.1',
-    ],
     zip_safe=False,
     include_package_data=True,
     classifiers=[
