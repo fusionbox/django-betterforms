@@ -1,10 +1,8 @@
 from collections import OrderedDict
 
-import django
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.views.generic import CreateView
-from django.core import urlresolvers
 from django.utils.encoding import force_text
 
 from .models import User, Profile, Badge, Book
@@ -14,6 +12,11 @@ from .forms import (
     CleanedBookMultiForm, BookMultiForm, RaisesErrorCustomCleanMultiform,
     ModifiesDataCustomCleanMultiform,
 )
+
+try:
+    from django.urls import reverse
+except ImportError:  # Django 1.9 and earlier
+    from django.core.urlresolvers import reverse
 
 
 class MultiFormTest(TestCase):
@@ -50,7 +53,9 @@ class MultiFormTest(TestCase):
 
     def test_fields(self):
         form = UserProfileMultiForm()
-        self.assertEqual(form.fields, ['user-name', 'profile-name', 'profile-display_name'])
+        self.assertEqual(form.fields, [
+            'user-name', 'profile-name', 'profile-display_name'
+        ])
 
     def test_errors(self):
         form = ErrorMultiForm()
@@ -97,7 +102,8 @@ class MultiFormTest(TestCase):
         form = ErrorMultiForm(data={})
 
         self.assertFalse(form.is_valid())
-        self.assertEqual(form.non_field_errors().as_text(), '* It broke\n* It broke')
+        self.assertEqual(form.non_field_errors().as_text(),
+                         '* It broke\n* It broke')
 
     def test_is_multipart(self):
         form1 = ErrorMultiForm()
@@ -108,14 +114,7 @@ class MultiFormTest(TestCase):
 
     def test_media(self):
         form = NeedsFileField()
-        static_prefix = ""
-        if django.VERSION < (1, 10):
-            static_prefix = "/static/"
-        self.assertEqual(form.media._js, [
-            static_prefix + 'admin/js/calendar.js',
-            static_prefix + 'admin/js/admin/DateTimeShortcuts.js',
-            'test.js',
-        ])
+        self.assertIn('test.js', form.media._js)
 
     def test_is_bound(self):
         form = ErrorMultiForm()
@@ -169,7 +168,7 @@ class MultiFormTest(TestCase):
         UserProfileMultiForm(initial=None)
 
     def test_works_with_wizard_view(self):
-        url = urlresolvers.reverse('test_wizard')
+        url = reverse('test_wizard')
         self.client.get(url)
 
         response = self.client.post(url, {
@@ -188,7 +187,8 @@ class MultiFormTest(TestCase):
         # support indexing, you are probably recommending to use form_dict
         # instead of form_list on Django>=1.7 anyway though.
         form_list = list(form_list)
-        self.assertEqual(form_list[0]['profile'].cleaned_data['name'], 'John Doe')
+        self.assertEqual(form_list[0]['profile'].cleaned_data['name'],
+                         'John Doe')
 
     def test_custom_clean_errors(self):
         form = RaisesErrorCustomCleanMultiform({

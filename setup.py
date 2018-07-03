@@ -12,6 +12,7 @@ version = '1.1.5.dev0'
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
+
 setup(
     name='django-betterforms',
     version=version,
@@ -20,25 +21,28 @@ setup(
     url="https://django-betterforms.readthedocs.org/en/latest/",
     author="Fusionbox",
     author_email='programmers@fusionbox.com',
-    packages=[package for package in find_packages() if package.startswith('betterforms')],
-    install_requires=[
-        'Django>=1.4',
-        'six',
-    ],
-    tests_require=[
-        'mock>=1.0.1',
-    ],
+    packages=[package for package in find_packages()
+              if package.startswith('betterforms')],
+    install_requires=['Django>=1.8'],
     zip_safe=False,
     include_package_data=True,
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
         'Framework :: Django',
+        'Framework :: Django :: 1.8',
+        'Framework :: Django :: 1.9',
+        'Framework :: Django :: 1.10',
+        'Framework :: Django :: 1.11',
+        'Framework :: Django :: 2.0',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: BSD License',
-        'Topic :: Internet :: WWW/HTTP',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2.6',
+        'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Topic :: Internet :: WWW/HTTP',
     ],
 )

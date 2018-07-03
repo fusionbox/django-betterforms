@@ -1,45 +1,41 @@
-from __future__ import print_function
-import os
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'betterforms-tests.db',
+    },
+}
+
+INSTALLED_APPS = (
+    'django.contrib.auth',
+    'django.contrib.admin',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.staticfiles',
+    'betterforms',
+    'tests',
+)
+
+DEBUG = True
 
 SECRET_KEY = 'JVpuGfSgVm2IxJ03xArw5mwmPuYEzAJMbhsTnvLXOPSQR4z93o'
 
-PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
+SITE_ID = 1
 
-MIDDLEWARE_CLASSES = (
-    'django.middleware.common.CommonMiddleware',
-    # We need the SessionMiddleware for the WizardView support tests in Django >= 1.7
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-)
+ROOT_URLCONF = 'tests.urls'
 
 TEMPLATES = [
     {
-		'DIRS': [
-			os.path.join(PROJECT_PATH, 'templates/'),
-		],
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'APP_DIRS': True,
     },
 ]
 
-INSTALLED_APPS = (
-    'django.contrib.sessions',
-    'django.contrib.contenttypes',
-    'django.contrib.auth',
-    'django.contrib.admin',
-    'django.contrib.staticfiles',
-    'tests',
-    'betterforms',
+MIDDLEWARE = (
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
 )
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'sqlite_database',
-    }
-}
-
-ROOT_URLCONF = 'tests.urls'
+# Django 1.9 and earlier
+MIDDLEWARE_CLASSES = MIDDLEWARE
 
 STATIC_URL = '/static/'
-DEBUG = True

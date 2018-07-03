@@ -6,18 +6,20 @@ cache: pip
 sudo: false
 env:
   matrix:
-    - TOX_ENV=dj17
     - TOX_ENV=dj18
     - TOX_ENV=dj19
     - TOX_ENV=dj110
+    - TOX_ENV=dj111
+    - TOX_ENV=dj20
     - TOX_ENV=djdev
 matrix:
    exclude:
-      - python: "3.5"
-        env: TOX_ENV=dj17
+      - python: "2.7"
+        env: TOX_ENV=dj20
+      - python: "2.7"
+        env: TOX_ENV=djdev
    allow_failures:
       - env: TOX_ENV=djdev
-
 install:
   - pip install --upgrade pip
   - pip install tox
