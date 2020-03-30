@@ -5,8 +5,8 @@ from django.forms.forms import pretty_name
 from django.core.exceptions import ValidationError, ImproperlyConfigured
 from django.db.models import Q
 from collections import OrderedDict
-from django.utils import six
-from django.utils.six.moves import reduce
+import six
+from six.moves import reduce
 from django.utils.http import urlencode
 
 from .forms import BetterForm
