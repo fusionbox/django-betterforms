@@ -11,8 +11,13 @@ try:
 except ImportError:  # Django < 1.7
     from django.forms.util import ErrorDict, ErrorList  # NOQA
 
+try:
+    from django.utils.encoding import python_2_unicode_compatible
+except ImportError:  # Python < 3.0, Django < 3.0
+    def python_2_unicode_compatible(klass):
+        return klass
+
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.safestring import mark_safe
 from six.moves import reduce
 
