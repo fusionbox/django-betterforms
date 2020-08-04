@@ -1,7 +1,7 @@
 import copy
 
 from django import forms
-from django.forms.forms import pretty_name
+from django.forms.utils import pretty_name
 from django.core.exceptions import ValidationError, ImproperlyConfigured
 from django.db.models import Q
 from collections import OrderedDict
