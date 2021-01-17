@@ -2,10 +2,6 @@
 from setuptools import setup, find_packages
 import os
 
-__doc__ = """
-App for Django featuring improved form base classes.
-"""
-
 version = '1.2.1.dev0'
 
 
@@ -16,7 +12,7 @@ def read(fname):
 setup(
     name='django-betterforms',
     version=version,
-    description=__doc__,
+    description='App for Django featuring improved form base classes.',
     long_description=read('README.rst'),
     url="https://django-betterforms.readthedocs.org/en/latest/",
     author="Fusionbox",
