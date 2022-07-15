@@ -2,9 +2,7 @@
 from setuptools import setup, find_packages
 import os
 
-__doc__ = """
-App for Django featuring improved form base classes.
-"""
+__doc__ = """App for Django featuring improved form base classes."""
 
 version = '1.2.1.dev0'
 
