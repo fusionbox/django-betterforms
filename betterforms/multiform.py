@@ -15,6 +15,7 @@ from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.safestring import mark_safe
 from django.utils.six.moves import reduce
+from django.db.models.query import QuerySet
 
 
 @python_2_unicode_compatible
@@ -180,7 +181,10 @@ class MultiModelForm(MultiForm):
         try:
             # If we only pass instance when there was one specified, we make it
             # possible to use non-ModelForms together with ModelForms.
-            fkwargs['instance'] = self.instances[key]
+            if isinstance(self.instances[key], QuerySet):
+                fkwargs['queryset'] = self.instances[key]
+            else:
+                fkwargs['instance'] = self.instances[key]
         except KeyError:
             pass
         return fargs, fkwargs
