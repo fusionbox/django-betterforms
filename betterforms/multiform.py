@@ -1,28 +1,12 @@
 from itertools import chain
 from operator import add
-
-try:
-    from collections import OrderedDict
-except ImportError:  # Python 2.6, Django < 1.7
-    from django.utils.datastructures import SortedDict as OrderedDict  # NOQA
-
-try:
-    from django.forms.utils import ErrorDict, ErrorList
-except ImportError:  # Django < 1.7
-    from django.forms.util import ErrorDict, ErrorList  # NOQA
-
-try:
-    from django.utils.encoding import python_2_unicode_compatible
-except ImportError:  # Python < 3.0, Django < 3.0
-    def python_2_unicode_compatible(klass):
-        return klass
-
+from collections import OrderedDict
+from django.forms.utils import ErrorList
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
 from django.utils.safestring import mark_safe
-from six.moves import reduce
+from functools import reduce
 
 
-@python_2_unicode_compatible
 class MultiForm(object):
     """
     A container that allows you to treat multiple forms as one form.  This is

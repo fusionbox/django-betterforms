@@ -4,6 +4,7 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from django.views.generic import CreateView
 from django.utils.encoding import force_text
+from django.urls import reverse
 
 from .models import User, Profile, Badge, Book
 from .forms import (
@@ -12,11 +13,6 @@ from .forms import (
     CleanedBookMultiForm, BookMultiForm, RaisesErrorCustomCleanMultiform,
     ModifiesDataCustomCleanMultiform,
 )
-
-try:
-    from django.urls import reverse
-except ImportError:  # Django 1.9 and earlier
-    from django.core.urlresolvers import reverse
 
 
 class MultiFormTest(TestCase):

@@ -5,8 +5,7 @@ from django.forms.utils import pretty_name
 from django.core.exceptions import ValidationError, ImproperlyConfigured
 from django.db.models import Q
 from collections import OrderedDict
-import six
-from six.moves import reduce
+from functools import reduce
 from django.utils.http import urlencode
 
 from .forms import BetterForm
@@ -229,7 +228,7 @@ def is_header_kwargs(header):
         return False
     try:
         return all((
-            isinstance(header[0], six.string_types),
+            isinstance(header[0], str),
             isinstance(header[1], dict),
         ))
     except (IndexError, KeyError):
@@ -247,7 +246,7 @@ class HeaderSet(object):
         for header in headers:
             if isinstance(header, Header):
                 self.headers[header.name] = header
-            elif isinstance(header, six.string_types):
+            elif isinstance(header, str):
                 self.headers[header] = self.HeaderClass(header)
             elif is_header_kwargs(header):
                 header_name, header_kwargs = header

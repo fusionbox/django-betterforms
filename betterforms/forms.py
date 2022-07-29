@@ -4,13 +4,6 @@ from django import forms
 from django.forms.utils import ErrorDict
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.template.loader import render_to_string
-import six
-
-try:
-    from django.utils.encoding import python_2_unicode_compatible
-except ImportError:  # Python < 3.0, Django < 3.0
-    def python_2_unicode_compatible(klass):
-        return klass
 
 
 class CSSClassMixin(object):
@@ -55,8 +48,8 @@ class LabelSuffixMixin(object):
 
 def process_fieldset_row(fields, fieldset_class, base_name):
     for index, row in enumerate(fields):
-        if not isinstance(row, (six.string_types, Fieldset)):
-            if len(row) == 2 and isinstance(row[0], six.string_types) and isinstance(row[1], dict):
+        if not isinstance(row, (str, Fieldset)):
+            if len(row) == 2 and isinstance(row[0], str) and isinstance(row[1], dict):
                 row = fieldset_class(row[0], **row[1])
             else:
                 row = fieldset_class("{0}_{1}".format(base_name, index), fields=row)
@@ -69,16 +62,16 @@ def flatten(elements):
     iterable of strings.
     """
     for element in elements:
-        if isinstance(element, collections.Iterable) and not isinstance(element, six.string_types):
+        if isinstance(element, collections.Iterable) and not isinstance(element, str):
             for sub_element in flatten(element):
                 yield sub_element
         else:
             yield element
 
+
 flatten_to_tuple = lambda x: tuple(flatten(x))
 
 
-@python_2_unicode_compatible
 class Fieldset(CSSClassMixin):
     FIELDSET_CSS_CLASS = 'formFieldset'
     css_classes = None
@@ -93,7 +86,7 @@ class Fieldset(CSSClassMixin):
         duplicates = [x for x, y in collections.Counter(names).items() if y > 1]
         if duplicates:
             raise AttributeError('Name Conflict in fieldset `{0}`.  The name(s) `{1}` appear multiple times.'.format(self.name, duplicates))
-        for key, value in six.iteritems(kwargs):
+        for key, value in kwargs.items():
             setattr(self, key, value)
 
     def __iter__(self):
@@ -101,9 +94,6 @@ class Fieldset(CSSClassMixin):
 
     def __bool__(self):
         return bool(self.base_fields)
-
-    # Python 2
-    __nonzero__ = __bool__
 
     def __str__(self):
         return self.name
@@ -122,7 +112,7 @@ class BoundFieldset(object):
         self.fieldset = fieldset
         self.rows = collections.OrderedDict()
         for row in fieldset:
-            self.rows[six.text_type(row)] = row
+            self.rows[str(row)] = row
 
     def __getitem__(self, key):
         """
@@ -134,7 +124,7 @@ class BoundFieldset(object):
         if isinstance(key, int) and not key in self.rows:
             return self[list(self.rows.keys())[key]]
         value = self.rows[key]
-        if isinstance(value, six.string_types):
+        if isinstance(value, str):
             return self.form[value]
         else:
             return type(self)(self.form, value, key)
@@ -194,7 +184,7 @@ class FieldsetMixin(NonBraindamagedErrorMixin):
     def __iter__(self):
         for fieldset in self.fieldsets:
             yield fieldset
-        #return iter(self.fieldsets)
+        # return iter(self.fieldsets)
 
     # These methods need to be implemented to render the fieldsets and fields
     # in a similar structure as `BaseForm`
@@ -253,7 +243,7 @@ class BetterModelFormMetaclass(forms.models.ModelFormMetaclass):
         return super(BetterModelFormMetaclass, cls).__new__(cls, name, bases, attrs)
 
 
-class BetterModelForm(six.with_metaclass(BetterModelFormMetaclass, FieldsetMixin, LabelSuffixMixin, CSSClassMixin, forms.ModelForm)):
+class BetterModelForm(FieldsetMixin, LabelSuffixMixin, CSSClassMixin, forms.ModelForm, metaclass=BetterModelFormMetaclass):
     pass
 
 
@@ -267,7 +257,7 @@ class BetterFormMetaClass(forms.forms.DeclarativeFieldsMetaclass):
         return super(BetterFormMetaClass, cls).__new__(cls, name, bases, attrs)
 
 
-class BetterForm(six.with_metaclass(BetterFormMetaClass, FieldsetMixin, LabelSuffixMixin, CSSClassMixin, forms.forms.BaseForm)):
+class BetterForm(FieldsetMixin, LabelSuffixMixin, CSSClassMixin, forms.forms.BaseForm, metaclass=BetterFormMetaClass):
     """
     A 'Better' base Form class.
     """

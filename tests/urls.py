@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.urls import path
 
 from formtools.wizard.views import SessionWizardView
 
@@ -14,7 +14,5 @@ class TestWizardView(SessionWizardView):
 
 
 urlpatterns = [
-    url(r'^test-wizard-view/$',
-        TestWizardView.as_view([Step1Form, Step2Form]),
-        name='test_wizard'),
+    path('test-wizard-view/', TestWizardView.as_view([Step1Form, Step2Form]), name='test_wizard'),
 ]
