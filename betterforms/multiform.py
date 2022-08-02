@@ -7,7 +7,7 @@ from django.utils.safestring import mark_safe
 from functools import reduce
 
 
-class MultiForm(object):
+class MultiForm():
     """
     A container that allows you to treat multiple forms as one form.  This is
     great for using more than one form on a page that share the same submit
@@ -162,10 +162,10 @@ class MultiModelForm(MultiForm):
         self.instances = kwargs.pop('instance', None)
         if self.instances is None:
             self.instances = {}
-        super(MultiModelForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def get_form_args_kwargs(self, key, args, kwargs):
-        fargs, fkwargs = super(MultiModelForm, self).get_form_args_kwargs(key, args, kwargs)
+        fargs, fkwargs = super().get_form_args_kwargs(key, args, kwargs)
         try:
             # If we only pass instance when there was one specified, we make it
             # possible to use non-ModelForms together with ModelForms.

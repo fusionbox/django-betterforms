@@ -30,7 +30,7 @@ class IterDict(OrderedDict):
     through the values rather than keys.
     """
     def __iter__(self):
-        for key in super(IterDict, self).__iter__():
+        for key in super().__iter__():
             yield self[key]
 
 
@@ -51,7 +51,7 @@ class BaseChangeListForm(BetterForm):
             raise AttributeError('`ChangeListForm`s must be instantiated with a\
                                  queryset, or have a `model` attribute set on\
                                  them')
-        super(BaseChangeListForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def get_queryset(self):
         """
@@ -69,7 +69,7 @@ class SearchForm(BaseChangeListForm):
 
     def __init__(self, *args, **kwargs):
         self.SEARCH_FIELDS = kwargs.pop('search_fields', self.SEARCH_FIELDS)
-        super(SearchForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         if self.SEARCH_FIELDS is None:
             raise ImproperlyConfigured('`SearchForm`s must be instantiated with an\
@@ -81,7 +81,7 @@ class SearchForm(BaseChangeListForm):
         Constructs an '__contains' or '__icontains' filter across all of the
         fields listed in ``SEARCH_FIELDS``.
         """
-        qs = super(SearchForm, self).get_queryset()
+        qs = super().get_queryset()
 
         # Do Searching
         q = self.cleaned_data.get('q', '').strip()
@@ -101,7 +101,7 @@ class SearchForm(BaseChangeListForm):
         return qs
 
 
-class BoundHeader(object):
+class BoundHeader():
     def __init__(self, form, header):
         self.form = form
         self.header = header
@@ -208,7 +208,7 @@ class BoundHeader(object):
         return construct_querystring(self.form.data, **{self.param: '.'.join(map(str, self.add_to_sorts()[1:]))})
 
 
-class Header(object):
+class Header():
     BoundClass = BoundHeader
     column_name = None
 
@@ -235,7 +235,7 @@ def is_header_kwargs(header):
         return False
 
 
-class HeaderSet(object):
+class HeaderSet():
     HeaderClass = Header
 
     def __init__(self, form, headers):
@@ -306,7 +306,7 @@ class SortFormBase(BetterForm):
     sorts = forms.CharField(required=False, widget=forms.HiddenInput())
 
     def __init__(self, *args, **kwargs):
-        super(SortFormBase, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.headers = self.HeaderSetClass(self, self.HEADERS)
 
     def clean_sorts(self):
@@ -351,5 +351,5 @@ class SortForm(BaseChangeListForm, SortFormBase):
         Returns an ordered queryset, sorted based on the values submitted in
         the sort parameter.
         """
-        qs = super(SortForm, self).get_queryset()
+        qs = super().get_queryset()
         return self.apply_sorting(qs)

@@ -141,7 +141,7 @@ by overriding the :meth:`MultiModelForm.save` method. ::
         }
 
         def save(self, commit=True):
-            objects = super(UserCreationMultiForm, self).save(commit=False)
+            objects = super().save(commit=False)
 
             if commit:
                 user = objects['user']
@@ -205,7 +205,7 @@ user/profile example, it would look something like this::
         success_url = reverse_lazy('home')
 
         def get_form_kwargs(self):
-            kwargs = super(UserSignupView, self).get_form_kwargs()
+            kwargs = super().get_form_kwargs()
             kwargs.update(instance={
                 'user': self.object,
                 'profile': self.object.profile,
@@ -217,7 +217,7 @@ Working with WizardView
 -----------------------
 
 :class:`MultiForms <MultiForm>` also support the ``WizardView`` classes
-provided by django-formtools_ (or Django before 1.8), however you must set a
+provided by django-formtools_, however you must set a
 ``base_fields`` attribute on your form class. ::
 
     # forms.py
@@ -237,11 +237,7 @@ provided by django-formtools_ (or Django before 1.8), however you must set a
 Then you can use it like normal. ::
 
     # views.py
-    try:
-        from django.contrib.formtools.wizard.views import SessionWizardView
-    except ImportError:  # Django >= 1.8
-        from formtools.wizard.views import SessionWizardView
-
+    from formtools.wizard.views import SessionWizardView
     from .forms import Step1Form, Step2Form
 
     class MyWizardView(SessionWizardView):

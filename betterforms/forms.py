@@ -6,7 +6,7 @@ from django.core.exceptions import NON_FIELD_ERRORS
 from django.template.loader import render_to_string
 
 
-class CSSClassMixin(object):
+class CSSClassMixin():
     """
     Sane defaults for error and css classes.
     """
@@ -14,7 +14,7 @@ class CSSClassMixin(object):
     required_css_class = 'required'
 
 
-class NonBraindamagedErrorMixin(object):
+class NonBraindamagedErrorMixin():
     """
     Form mixin for easier field based error messages.
     """
@@ -27,7 +27,7 @@ class NonBraindamagedErrorMixin(object):
         self.field_error(NON_FIELD_ERRORS, error)
 
 
-class LabelSuffixMixin(object):
+class LabelSuffixMixin():
     """
     Form mixin to make it possible to override the label_suffix at class
     declaration.  Django's built-in Form class only allows you to override the
@@ -43,7 +43,7 @@ class LabelSuffixMixin(object):
 
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('label_suffix', self.label_suffix)
-        super(LabelSuffixMixin, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 def process_fieldset_row(fields, fieldset_class, base_name):
@@ -103,7 +103,7 @@ class Fieldset(CSSClassMixin):
         return flatten_to_tuple(self)
 
 
-class BoundFieldset(object):
+class BoundFieldset():
     is_fieldset = True
 
     def __init__(self, form, fieldset, name):
@@ -177,7 +177,7 @@ class FieldsetMixin(NonBraindamagedErrorMixin):
 
     def __getitem__(self, key):
         try:
-            return super(FieldsetMixin, self).__getitem__(key)
+            return super().__getitem__(key)
         except KeyError:
             return self.fieldsets[key]
 
@@ -240,7 +240,7 @@ class BetterModelFormMetaclass(forms.models.ModelFormMetaclass):
             if Meta and Meta.__dict__.get('fields') is None and Meta.__dict__.get('exclude') is None:
                 attrs['Meta'].fields = flatten_to_tuple(base_fieldsets)
         attrs['base_fieldsets'] = base_fieldsets
-        return super(BetterModelFormMetaclass, cls).__new__(cls, name, bases, attrs)
+        return super().__new__(cls, name, bases, attrs)
 
 
 class BetterModelForm(FieldsetMixin, LabelSuffixMixin, CSSClassMixin, forms.ModelForm, metaclass=BetterModelFormMetaclass):
@@ -254,7 +254,7 @@ class BetterFormMetaClass(forms.forms.DeclarativeFieldsMetaclass):
             FieldsetClass = get_fieldset_class(bases, attrs)
             base_fieldsets = FieldsetClass('__base_fieldset__', fields=base_fieldsets)
         attrs['base_fieldsets'] = base_fieldsets
-        return super(BetterFormMetaClass, cls).__new__(cls, name, bases, attrs)
+        return super().__new__(cls, name, bases, attrs)
 
 
 class BetterForm(FieldsetMixin, LabelSuffixMixin, CSSClassMixin, forms.forms.BaseForm, metaclass=BetterFormMetaClass):

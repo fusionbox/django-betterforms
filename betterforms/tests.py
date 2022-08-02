@@ -1,6 +1,6 @@
 import unittest  # NOQA
 
-import mock
+from unittest import mock
 
 import django
 from django import forms
@@ -1189,7 +1189,7 @@ class TestSortFormAPI(TestCase):
 
         class OverriddenOrderForm(self.TestSortForm):
             def get_order_by(self):
-                order_by = super(OverriddenOrderForm, self).get_order_by()
+                order_by = super().get_order_by()
                 return ['field_a'] + order_by
 
         f = OverriddenOrderForm({'sorts': '-3.2'})

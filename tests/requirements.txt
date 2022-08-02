@@ -2,4 +2,3 @@ django-formtools
 pytest
 pytest-django
 pytest-cov
-mock >=1.0.1
