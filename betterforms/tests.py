@@ -91,9 +91,9 @@ class TestFieldsetDeclarationSyntax(TestCase):
 
             class Meta:
                 fieldsets = (
-                    ('first', {'fields': ('a')}),
+                    ('first', {'fields': ('a',)}),
                     ('second', {'fields': ('b', 'c')}),
-                    ('third', {'fields': ('d')}),
+                    ('third', {'fields': ('d',)}),
                 )
         form = TestForm()
         fieldsets = [fieldset for fieldset in form.fieldsets]
@@ -135,7 +135,7 @@ class TestBetterForm(TestCase):
             class Meta:
                 fieldsets = (
                     ('first', {'fields': ('a', 'b')}),
-                    ('second', {'fields': ('c')}),
+                    ('second', {'fields': ('c',)}),
                 )
         self.TestForm = TestForm
 
@@ -162,7 +162,7 @@ class TestBetterForm(TestCase):
                 class Meta:
                     fieldsets = (
                         ('first', {'fields': ('a', 'b')}),
-                        ('first', {'fields': ('c')}),
+                        ('first', {'fields': ('c',)}),
                     )
 
     def test_duplicate_name_in_fieldset(self):
@@ -171,7 +171,7 @@ class TestBetterForm(TestCase):
                 class Meta:
                     fieldsets = (
                         ('first', {'fields': ('a', 'a')}),
-                        ('second', {'fields': ('c')}),
+                        ('second', {'fields': ('c',)}),
                     )
 
     def test_field_error(self):
@@ -213,7 +213,7 @@ class TestBetterForm(TestCase):
             class Meta:
                 fieldsets = (
                     ('first', {'fields': ('a', 'b')}),
-                    ('second', {'fields': ('c'), 'css_classes': ['arst', 'tsra']}),
+                    ('second', {'fields': ('c',), 'css_classes': ['arst', 'tsra']}),
                 )
         form = TestForm()
         self.assertIn('arst', form.fieldsets[1].css_classes)
@@ -323,7 +323,7 @@ class TestFormRendering(TestCase):
             class Meta:
                 fieldsets = (
                     ('first', {'fields': ('a', 'b')}),
-                    ('second', {'fields': ('c')}),
+                    ('second', {'fields': ('c',)}),
                 )
         self.TestForm = TestForm
 
@@ -571,7 +571,7 @@ class TestFormRendering(TestCase):
             class Meta:
                 fieldsets = (
                     Fieldset('first', ('a', 'b'), legend='First Fieldset'),
-                    Fieldset('second', ('c'), legend='Second Fieldset'),
+                    Fieldset('second', ('c',), legend='Second Fieldset'),
                 )
 
         form = TestForm()

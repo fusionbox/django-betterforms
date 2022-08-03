@@ -101,7 +101,7 @@ class SearchForm(BaseChangeListForm):
         return qs
 
 
-class BoundHeader():
+class BoundHeader:
     def __init__(self, form, header):
         self.form = form
         self.header = header
@@ -208,7 +208,7 @@ class BoundHeader():
         return construct_querystring(self.form.data, **{self.param: '.'.join(map(str, self.add_to_sorts()[1:]))})
 
 
-class Header():
+class Header:
     BoundClass = BoundHeader
     column_name = None
 
@@ -235,7 +235,7 @@ def is_header_kwargs(header):
         return False
 
 
-class HeaderSet():
+class HeaderSet:
     HeaderClass = Header
 
     def __init__(self, form, headers):

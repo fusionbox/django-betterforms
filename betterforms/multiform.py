@@ -7,7 +7,7 @@ from django.utils.safestring import mark_safe
 from functools import reduce
 
 
-class MultiForm():
+class MultiForm:
     """
     A container that allows you to treat multiple forms as one form.  This is
     great for using more than one form on a page that share the same submit

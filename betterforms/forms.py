@@ -6,7 +6,7 @@ from django.core.exceptions import NON_FIELD_ERRORS
 from django.template.loader import render_to_string
 
 
-class CSSClassMixin():
+class CSSClassMixin:
     """
     Sane defaults for error and css classes.
     """
@@ -14,7 +14,7 @@ class CSSClassMixin():
     required_css_class = 'required'
 
 
-class NonBraindamagedErrorMixin():
+class NonBraindamagedErrorMixin:
     """
     Form mixin for easier field based error messages.
     """
@@ -27,7 +27,7 @@ class NonBraindamagedErrorMixin():
         self.field_error(NON_FIELD_ERRORS, error)
 
 
-class LabelSuffixMixin():
+class LabelSuffixMixin:
     """
     Form mixin to make it possible to override the label_suffix at class
     declaration.  Django's built-in Form class only allows you to override the
@@ -103,7 +103,7 @@ class Fieldset(CSSClassMixin):
         return flatten_to_tuple(self)
 
 
-class BoundFieldset():
+class BoundFieldset:
     is_fieldset = True
 
     def __init__(self, form, fieldset, name):

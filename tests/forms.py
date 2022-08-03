@@ -179,13 +179,13 @@ class CleanedBookMultiForm(BookMultiForm):
 
 class RaisesErrorCustomCleanMultiform(UserProfileMultiForm):
     def clean(self):
-        cleaned_data = super().clean()
+        cleaned_data = super(UserProfileMultiForm, self).clean()
         raise ValidationError('It broke')
         return cleaned_data
 
 
 class ModifiesDataCustomCleanMultiform(UserProfileMultiForm):
     def clean(self):
-        cleaned_data = super().clean()
+        cleaned_data = super(UserProfileMultiForm, self).clean()
         cleaned_data['profile']['display_name'] = "cleaned name"
         return cleaned_data
