@@ -1,4 +1,4 @@
-import collections
+import collections.abc as collections
 
 from django import forms
 from django.forms.utils import ErrorDict
