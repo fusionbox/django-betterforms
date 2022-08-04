@@ -120,9 +120,9 @@ class TestFieldsetDeclarationSyntax(TestCase):
         self.assertEqual(fieldsets[1].name, '__base_fieldset___1')
         self.assertTupleEqual(fieldsets[1].fieldset.fields, ('b', 'c'))
         self.assertEqual(fieldsets[2].field, form.fields['d'])
-        self.assertIsInstance(fieldsets[0], forms.forms.BoundField)
+        self.assertIsInstance(fieldsets[0], forms.BoundField)
         self.assertIsInstance(fieldsets[1], BoundFieldset)
-        self.assertIsInstance(fieldsets[2], forms.forms.BoundField)
+        self.assertIsInstance(fieldsets[2], forms.BoundField)
 
 
 class TestBetterForm(TestCase):

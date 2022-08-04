@@ -37,3 +37,5 @@ MIDDLEWARE = [
 ]
 
 STATIC_URL = '/static/'
+
+USE_TZ = False
