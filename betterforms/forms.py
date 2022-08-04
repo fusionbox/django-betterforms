@@ -3,6 +3,8 @@ try:
 except AttributeError:
     import collections
 
+from collections import Counter, OrderedDict
+
 from django import forms
 from django.forms.utils import ErrorDict
 from django.core.exceptions import NON_FIELD_ERRORS
@@ -86,7 +88,7 @@ class Fieldset(CSSClassMixin):
         self.legend = kwargs.pop("legend", None)
         # Check for duplicate names.
         names = [str(thing) for thing in self.base_fields]
-        duplicates = [x for x, y in collections.Counter(names).items() if y > 1]
+        duplicates = [x for x, y in Counter(names).items() if y > 1]
         if duplicates:
             raise AttributeError('Name Conflict in fieldset `{0}`.  The name(s) `{1}` appear multiple times.'.format(self.name, duplicates))
         for key, value in kwargs.items():
@@ -113,7 +115,7 @@ class BoundFieldset:
         self.form = form
         self.name = name
         self.fieldset = fieldset
-        self.rows = collections.OrderedDict()
+        self.rows = OrderedDict()
         for row in fieldset:
             self.rows[str(row)] = row
 
