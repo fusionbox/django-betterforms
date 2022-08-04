@@ -2,7 +2,7 @@
 ------------------
 Backwards-incompatible changes:
 
-- Removed support for python 2.7
+- Removed support for python 2.7 and 3.4
 - Removed support for Django versions 1.8, 1.9, and 1.10.
 
 New Features and Bugfixes:
