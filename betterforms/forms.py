@@ -1,4 +1,7 @@
-import collections.abc as collections
+try:
+    import collections.abc as collections
+except AttributeError:
+    import collections
 
 from django import forms
 from django.forms.utils import ErrorDict
