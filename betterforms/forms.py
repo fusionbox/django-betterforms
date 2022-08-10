@@ -1,8 +1,8 @@
 try:
-    import collections.abc as collections
+    from collections.abc import Iterable
 except AttributeError:
-    import collections
-
+    # BBB Python < 3.9
+    from collections import Iterable
 from collections import Counter, OrderedDict
 
 from django import forms
@@ -67,7 +67,7 @@ def flatten(elements):
     iterable of strings.
     """
     for element in elements:
-        if isinstance(element, collections.Iterable) and not isinstance(element, str):
+        if isinstance(element, Iterable) and not isinstance(element, str):
             for sub_element in flatten(element):
                 yield sub_element
         else:

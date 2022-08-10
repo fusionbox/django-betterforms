@@ -241,18 +241,18 @@ class TestBetterForm(TestCase):
 class TestBetterModelForm(TestCase):
     def setUp(self):
         class TestModel(models.Model):
-            class Meta:
-                abstract = True
             a = models.CharField(max_length=255)
             b = models.CharField(max_length=255)
             c = models.CharField(max_length=255)
             d = models.CharField(max_length=255)
+
         self.TestModel = TestModel
 
     def test_basic_fieldsets(self):
         class TestModelForm(BetterModelForm):
             class Meta:
                 model = self.TestModel
+
                 fieldsets = (
                     ('first', {'fields': ('a',)}),
                     ('second', {'fields': ('b', 'c')}),
