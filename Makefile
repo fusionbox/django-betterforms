@@ -1,7 +1,6 @@
 SETTINGS=tests.sqlite_test_settings
 COVERAGE_ARGS=
 
-
 test: test-builtin
 
 test-builtin:

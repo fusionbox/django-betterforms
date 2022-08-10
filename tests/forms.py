@@ -142,7 +142,7 @@ class BookMultiForm(MultiModelForm):
                 'book': instance,
                 'images': instance,
             }
-        super(BookMultiForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class RaisesErrorBookMultiForm(BookMultiForm):

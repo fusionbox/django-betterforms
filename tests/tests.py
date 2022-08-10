@@ -3,7 +3,12 @@ from collections import OrderedDict
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.views.generic import CreateView
-from django.utils.encoding import force_text
+try:
+    from django.utils.encoding import force_str
+except ImportError:
+    # BBB: Django <= 2.2
+    from django.utils.encoding import force_text as force_str
+from django.urls import reverse
 
 from .models import User, Profile, Badge, Book
 from .forms import (
@@ -12,11 +17,6 @@ from .forms import (
     CleanedBookMultiForm, BookMultiForm, RaisesErrorCustomCleanMultiform,
     ModifiesDataCustomCleanMultiform,
 )
-
-try:
-    from django.urls import reverse
-except ImportError:  # Django 1.9 and earlier
-    from django.core.urlresolvers import reverse
 
 
 class MultiFormTest(TestCase):
@@ -68,7 +68,7 @@ class MultiFormTest(TestCase):
 
     def test_to_str_is_as_table(self):
         form = UserProfileMultiForm()
-        self.assertEqual(force_text(form), form.as_table())
+        self.assertEqual(force_str(form), form.as_table())
 
     def test_as_ul(self):
         form = UserProfileMultiForm()

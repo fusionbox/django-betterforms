@@ -30,12 +30,12 @@ TEMPLATES = [
     },
 ]
 
-MIDDLEWARE = (
+MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-)
-# Django 1.9 and earlier
-MIDDLEWARE_CLASSES = MIDDLEWARE
+]
 
 STATIC_URL = '/static/'
+
+USE_TZ = False

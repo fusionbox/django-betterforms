@@ -1,24 +1,13 @@
 from itertools import chain
 from operator import add
-
-try:
-    from collections import OrderedDict
-except ImportError:  # Python 2.6, Django < 1.7
-    from django.utils.datastructures import SortedDict as OrderedDict  # NOQA
-
-try:
-    from django.forms.utils import ErrorDict, ErrorList
-except ImportError:  # Django < 1.7
-    from django.forms.util import ErrorDict, ErrorList  # NOQA
-
+from collections import OrderedDict
+from django.forms.utils import ErrorList
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.safestring import mark_safe
-from django.utils.six.moves import reduce
+from functools import reduce
 
 
-@python_2_unicode_compatible
-class MultiForm(object):
+class MultiForm:
     """
     A container that allows you to treat multiple forms as one form.  This is
     great for using more than one form on a page that share the same submit
@@ -173,10 +162,10 @@ class MultiModelForm(MultiForm):
         self.instances = kwargs.pop('instance', None)
         if self.instances is None:
             self.instances = {}
-        super(MultiModelForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def get_form_args_kwargs(self, key, args, kwargs):
-        fargs, fkwargs = super(MultiModelForm, self).get_form_args_kwargs(key, args, kwargs)
+        fargs, fkwargs = super().get_form_args_kwargs(key, args, kwargs)
         try:
             # If we only pass instance when there was one specified, we make it
             # possible to use non-ModelForms together with ModelForms.

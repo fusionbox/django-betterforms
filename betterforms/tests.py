@@ -1,12 +1,6 @@
-import sys
-if sys.version_info < (2, 7):
-    # In python < 2.7 unittest doesn't have expectedFailure
-    from django.utils import unittest
-else:
-    # django.utils.unittest became deprecated in Django 1.7
-    import unittest  # NOQA
+import unittest  # NOQA
 
-import mock
+from unittest import mock
 
 import django
 from django import forms
@@ -97,9 +91,9 @@ class TestFieldsetDeclarationSyntax(TestCase):
 
             class Meta:
                 fieldsets = (
-                    ('first', {'fields': ('a')}),
+                    ('first', {'fields': ('a',)}),
                     ('second', {'fields': ('b', 'c')}),
-                    ('third', {'fields': ('d')}),
+                    ('third', {'fields': ('d',)}),
                 )
         form = TestForm()
         fieldsets = [fieldset for fieldset in form.fieldsets]
@@ -126,9 +120,9 @@ class TestFieldsetDeclarationSyntax(TestCase):
         self.assertEqual(fieldsets[1].name, '__base_fieldset___1')
         self.assertTupleEqual(fieldsets[1].fieldset.fields, ('b', 'c'))
         self.assertEqual(fieldsets[2].field, form.fields['d'])
-        self.assertIsInstance(fieldsets[0], forms.forms.BoundField)
+        self.assertIsInstance(fieldsets[0], forms.BoundField)
         self.assertIsInstance(fieldsets[1], BoundFieldset)
-        self.assertIsInstance(fieldsets[2], forms.forms.BoundField)
+        self.assertIsInstance(fieldsets[2], forms.BoundField)
 
 
 class TestBetterForm(TestCase):
@@ -141,7 +135,7 @@ class TestBetterForm(TestCase):
             class Meta:
                 fieldsets = (
                     ('first', {'fields': ('a', 'b')}),
-                    ('second', {'fields': ('c')}),
+                    ('second', {'fields': ('c',)}),
                 )
         self.TestForm = TestForm
 
@@ -168,7 +162,7 @@ class TestBetterForm(TestCase):
                 class Meta:
                     fieldsets = (
                         ('first', {'fields': ('a', 'b')}),
-                        ('first', {'fields': ('c')}),
+                        ('first', {'fields': ('c',)}),
                     )
 
     def test_duplicate_name_in_fieldset(self):
@@ -177,7 +171,7 @@ class TestBetterForm(TestCase):
                 class Meta:
                     fieldsets = (
                         ('first', {'fields': ('a', 'a')}),
-                        ('second', {'fields': ('c')}),
+                        ('second', {'fields': ('c',)}),
                     )
 
     def test_field_error(self):
@@ -219,7 +213,7 @@ class TestBetterForm(TestCase):
             class Meta:
                 fieldsets = (
                     ('first', {'fields': ('a', 'b')}),
-                    ('second', {'fields': ('c'), 'css_classes': ['arst', 'tsra']}),
+                    ('second', {'fields': ('c',), 'css_classes': ['arst', 'tsra']}),
                 )
         form = TestForm()
         self.assertIn('arst', form.fieldsets[1].css_classes)
@@ -247,18 +241,18 @@ class TestBetterForm(TestCase):
 class TestBetterModelForm(TestCase):
     def setUp(self):
         class TestModel(models.Model):
-            class Meta:
-                abstract = True
             a = models.CharField(max_length=255)
             b = models.CharField(max_length=255)
             c = models.CharField(max_length=255)
             d = models.CharField(max_length=255)
+
         self.TestModel = TestModel
 
     def test_basic_fieldsets(self):
         class TestModelForm(BetterModelForm):
             class Meta:
                 model = self.TestModel
+
                 fieldsets = (
                     ('first', {'fields': ('a',)}),
                     ('second', {'fields': ('b', 'c')}),
@@ -329,7 +323,7 @@ class TestFormRendering(TestCase):
             class Meta:
                 fieldsets = (
                     ('first', {'fields': ('a', 'b')}),
-                    ('second', {'fields': ('c')}),
+                    ('second', {'fields': ('c',)}),
                 )
         self.TestForm = TestForm
 
@@ -577,7 +571,7 @@ class TestFormRendering(TestCase):
             class Meta:
                 fieldsets = (
                     Fieldset('first', ('a', 'b'), legend='First Fieldset'),
-                    Fieldset('second', ('c'), legend='Second Fieldset'),
+                    Fieldset('second', ('c',), legend='Second Fieldset'),
                 )
 
         form = TestForm()
@@ -1195,7 +1189,7 @@ class TestSortFormAPI(TestCase):
 
         class OverriddenOrderForm(self.TestSortForm):
             def get_order_by(self):
-                order_by = super(OverriddenOrderForm, self).get_order_by()
+                order_by = super().get_order_by()
                 return ['field_a'] + order_by
 
         f = OverriddenOrderForm({'sorts': '-3.2'})

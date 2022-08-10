@@ -25,5 +25,5 @@ class BrowseView(ListView, FormView):
             kwargs['object_list'] = form.get_queryset()
         else:
             kwargs['object_list'] = form.base_queryset.none()
-        kwargs = super(BrowseView, self).get_context_data(**kwargs)
+        kwargs = super().get_context_data(**kwargs)
         return kwargs
