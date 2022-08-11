@@ -1,8 +1,8 @@
 django-betterforms
 ------------------
 
-.. image:: https://travis-ci.org/fusionbox/django-betterforms.png
-   :target: http://travis-ci.org/fusionbox/django-betterforms
+.. image:: https://github.com/fusionbox/django-betterforms/actions/workflows/ci.yml/badge.svg
+   :target: https://github.com/fusionbox/django-betterforms/actions/workflows/ci.yml
    :alt: Build Status
 
 .. image:: https://coveralls.io/repos/fusionbox/django-betterforms/badge.png
@@ -20,3 +20,8 @@ Installation
     $ pip install django-betterforms
 
 2.  Add ``betterforms`` to your ``INSTALLED_APPS``.
+
+
+
+For information on the release process, refer to `django-authtools <https://github.com/fusionbox/django-authtools/blob/master/RELEASES.rst>`_.
+

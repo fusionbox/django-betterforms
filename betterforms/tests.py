@@ -358,10 +358,7 @@ class TestFormRendering(TestCase):
                 <input id="id_c" name="c" required type="text" />
             </div>
             """
-        if django.VERSION < (1, 8):
-            test = test.replace('label class="required"', 'label')
-        if django.VERSION < (1, 10):
-            test = test.replace(' required ', ' ')
+
         self.assertHTMLEqual(
             render_to_string('betterforms/form_as_fieldsets.html', env),
             test,
@@ -382,10 +379,7 @@ class TestFormRendering(TestCase):
                 <input id="id_c" name="c" required type="text" />
             </div>
             """
-        if django.VERSION < (1, 8):
-            test = test.replace('label class="required"', 'label')
-        if django.VERSION < (1, 10):
-            test = test.replace(' required ', ' ')
+
         self.assertHTMLEqual(
             render_to_string('betterforms/form_as_fieldsets.html', env),
             test,
@@ -417,10 +411,7 @@ class TestFormRendering(TestCase):
                 </div>
             </fieldset>
             """
-        if django.VERSION < (1, 8):
-            test = test.replace('label class="required"', 'label')
-        if django.VERSION < (1, 10):
-            test = test.replace(' required ', ' ')
+
         self.assertHTMLEqual(
             render_to_string('betterforms/form_as_fieldsets.html', env),
             test,
@@ -445,10 +436,7 @@ class TestFormRendering(TestCase):
                 </div>
             </fieldset>
             """
-        if django.VERSION < (1, 8):
-            test = test.replace('label class="required"', 'label')
-        if django.VERSION < (1, 10):
-            test = test.replace(' required ', ' ')
+
         self.assertHTMLEqual(
             render_to_string('betterforms/form_as_fieldsets.html', env),
             test,
@@ -477,10 +465,7 @@ class TestFormRendering(TestCase):
                 <input id="id_b" name="b" type="text" />
             </div>
             """
-        if django.VERSION < (1, 8):
-            test = test.replace('label class="required"', 'label')
-        if django.VERSION < (1, 10):
-            test = test.replace(' required ', ' ')
+
         self.assertHTMLEqual(
             render_to_string('betterforms/form_as_fieldsets.html', env),
             test,
@@ -521,10 +506,7 @@ class TestFormRendering(TestCase):
                 </p>
             </fieldset>
             """
-        if django.VERSION < (1, 8):
-            test = test.replace('label class="required"', 'label')
-        if django.VERSION < (1, 10):
-            test = test.replace(' required ', ' ')
+
         self.assertHTMLEqual(
             form.as_p(),
             test,
@@ -551,10 +533,7 @@ class TestFormRendering(TestCase):
             </fieldset>
             """
         self.maxDiff=None
-        if django.VERSION < (1, 8):
-            test = test.replace('label class="required"', 'label')
-        if django.VERSION < (1, 10):
-            test = test.replace(' required ', ' ')
+
         self.assertHTMLEqual(
             form.as_p(),
             test,
@@ -595,10 +574,7 @@ class TestFormRendering(TestCase):
                 </p>
             </fieldset>
             """
-        if django.VERSION < (1, 8):
-            test = test.replace('label class="required"', 'label')
-        if django.VERSION < (1, 10):
-            test = test.replace(' required ', ' ')
+
         self.assertHTMLEqual(
             form.as_p(),
             test,
@@ -617,10 +593,7 @@ class TestFormRendering(TestCase):
                 <input type="text" id="id_prefix-name" required name="prefix-name" />
             </div>
             """
-        if django.VERSION < (1, 8):
-            test = test.replace('label class="required"', 'label')
-        if django.VERSION < (1, 10):
-            test = test.replace(' required ', ' ')
+
         self.assertHTMLEqual(
             render_to_string('betterforms/form_as_fieldsets.html', env),
             test,
