@@ -1,6 +1,8 @@
 from itertools import chain
 from operator import add
 from collections import OrderedDict
+
+from django.forms import BaseFormSet
 from django.forms.utils import ErrorList
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
 from django.utils.safestring import mark_safe
@@ -143,17 +145,13 @@ class MultiForm:
 
     @cleaned_data.setter
     def cleaned_data(self, data):
-        try:
-            for key, value in data.items():
-                self.forms[key].cleaned_data = value
-        except AttributeError:
-            for key, value in data.items():
-                child_form = self[key]
-                if hasattr(child_form, 'forms'):
-                    for formlet, formlet_data in zip(child_form.forms, value):
-                        formlet.cleaned_data = formlet_data
-                else:
-                    child_form.cleaned_data = value
+        for key, value in data.items():
+            child_form = self[key]
+            if isinstance(child_form, BaseFormSet):
+                for formlet, formlet_data in zip(child_form.forms, value):
+                    formlet.cleaned_data = formlet_data
+            else:
+                child_form.cleaned_data = value
 
 
 class MultiModelForm(MultiForm):
