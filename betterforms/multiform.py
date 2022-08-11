@@ -143,13 +143,17 @@ class MultiForm:
 
     @cleaned_data.setter
     def cleaned_data(self, data):
-        for key, value in data.items():
-            child_form = self[key]
-            if hasattr(child_form, 'forms'):
-                for formlet, formlet_data in zip(child_form.forms, value):
-                    formlet.cleaned_data = formlet_data
-            else:
-                child_form.cleaned_data = value
+        try:
+            for key, value in data.items():
+                self.forms[key].cleaned_data = value
+        except AttributeError:
+            for key, value in data.items():
+                child_form = self[key]
+                if hasattr(child_form, 'forms'):
+                    for formlet, formlet_data in zip(child_form.forms, value):
+                        formlet.cleaned_data = formlet_data
+                else:
+                    child_form.cleaned_data = value
 
 
 class MultiModelForm(MultiForm):
