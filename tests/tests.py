@@ -15,7 +15,7 @@ from .forms import (
     UserProfileMultiForm, BadgeMultiForm, ErrorMultiForm, MixedForm,
     NeedsFileField, ManyToManyMultiForm, RaisesErrorBookMultiForm,
     CleanedBookMultiForm, BookMultiForm, RaisesErrorCustomCleanMultiform,
-    ModifiesDataCustomCleanMultiform,
+    ModifiesDataCustomCleanMultiform, OuterMultiForm
 )
 
 
@@ -224,6 +224,14 @@ class MultiFormTest(TestCase):
             })
         ]))
 
+    def test_multiform_in_multiform(self):
+        form = OuterMultiForm({
+            'user-name': 'foo1',
+            'profile-name': 'foo2',
+        })
+        form.is_valid()
+        self.assertTrue(form['foo4'].cleaned_data == OrderedDict([('foo3', {})]))
+
 
 class MultiModelFormTest(TestCase):
     def test_save(self):
@@ -323,7 +331,7 @@ class MultiModelFormTest(TestCase):
             'images-INITIAL_FORMS': '0',
             'images-MAX_NUM_FORMS': '1000',
         })
-        assert form.is_valid()
+        self.assertTrue(form.is_valid())
 
     def test_override_clean(self):
         form = CleanedBookMultiForm({

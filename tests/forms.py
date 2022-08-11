@@ -189,3 +189,19 @@ class ModifiesDataCustomCleanMultiform(UserProfileMultiForm):
         cleaned_data = super(UserProfileMultiForm, self).clean()
         cleaned_data['profile']['display_name'] = "cleaned name"
         return cleaned_data
+
+
+class RegularForm(forms.Form):
+    pass
+
+
+class InnerMultiform(MultiForm):
+    form_classes = {
+        'foo3': RegularForm
+    }
+
+
+class OuterMultiForm(MultiForm):
+    form_classes = {
+        'foo4': InnerMultiform,
+    }
