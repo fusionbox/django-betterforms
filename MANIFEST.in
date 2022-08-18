@@ -1,3 +1,4 @@
 include LICENSE
 include README.rst
+include CHANGES.rst
 recursive-include betterforms/templates *

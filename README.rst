@@ -22,6 +22,3 @@ Installation
 2.  Add ``betterforms`` to your ``INSTALLED_APPS``.
 
 
-
-For information on the release process, refer to `django-authtools <https://github.com/fusionbox/django-authtools/blob/master/RELEASES.rst>`_.
-
