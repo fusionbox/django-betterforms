@@ -26,9 +26,9 @@ base classes provided by ``betterforms``.
 
 .. code-block:: python
 
-    from betterforms.forms import BaseForm
+    from betterforms.forms import BetterForm
 
-    class RegistrationForm(BaseForm):
+    class RegistrationForm(BetterForm):
         ...
         class Meta:
             fieldsets = (
