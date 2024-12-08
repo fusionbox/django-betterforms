@@ -8,65 +8,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # Django 1.11
-          - django-version: "1.11.0"
-            python-version: "3.5"
-          - django-version: "1.11.0"
-            python-version: "3.6"
-          - django-version: "1.11.0"
-            python-version: "3.7"
-          # Django 2.0
-          - django-version: "2.0.0"
-            python-version: "3.5"
-          - django-version: "2.0.0"
-            python-version: "3.6"
-          - django-version: "2.0.0"
-            python-version: "3.7"
-          # Django 2.1
-          - django-version: "2.1.0"
-            python-version: "3.5"
-          - django-version: "2.1.0"
-            python-version: "3.6"
-          - django-version: "2.1.0"
-            python-version: "3.7"
-          # Django 2.2
-          - django-version: "2.2.0"
-            python-version: "3.5"
-          - django-version: "2.2.0"
-            python-version: "3.6"
-          - django-version: "2.2.0"
-            python-version: "3.7"
-          - django-version: "2.2.0"
-            python-version: "3.8"
-          - django-version: "2.2.0"
-            python-version: "3.9"
-          # Django 3.0
-          - django-version: "3.0.0"
-            python-version: "3.6"
-          - django-version: "3.0.0"
-            python-version: "3.7"
-          - django-version: "3.0.0"
-            python-version: "3.8"
-          - django-version: "3.0.0"
-            python-version: "3.9"
-          # Django 3.1
-          - django-version: "3.1.0"
-            python-version: "3.6"
-          - django-version: "3.1.0"
-            python-version: "3.7"
-          - django-version: "3.1.0"
-            python-version: "3.8"
-          - django-version: "3.1.0"
-            python-version: "3.9"
-          # Django 3.2
-          - django-version: "3.2.0"
-            python-version: "3.6"
-          - django-version: "3.2.0"
-            python-version: "3.7"
-          - django-version: "3.2.0"
-            python-version: "3.8"
-          - django-version: "3.2.0"
-            python-version: "3.9"
+         
           # Django 4.0
           - django-version: "4.0.0"
             python-version: "3.8"
@@ -74,6 +16,20 @@ jobs:
             python-version: "3.9"
           - django-version: "4.0.0"
             python-version: "3.10"
+          # Django 5.0
+          - django-version: "5.0.9"
+            python-version: "3.11"
+          - django-version: "5.0.9"
+            python-version: "3.12"
+          - django-version: "5.0.9"
+            python-version: "3.13"
+          # Django 5.1
+          - django-version: "5.1"
+            python-version: "3.11"
+          - django-version: "5.1"
+            python-version: "3.12"
+          - django-version: "5.1"
+            python-version: "3.13"
 
     steps:
     - uses: actions/checkout@v3
