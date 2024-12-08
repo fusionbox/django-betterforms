@@ -363,22 +363,40 @@ class TestFormRendering(TestCase):
             render_to_string('betterforms/form_as_fieldsets.html', env),
             test,
         )
-        form.field_error('a', 'this is an error message')
-        test = """
-            <div class="required error a formField">
-                <label class="required" for="id_a">A</label>
-                <input id="id_a" name="a" required type="text" />
-                <ul class="errorlist"><li>this is an error message</li></ul>
-            </div>
-            <div class="b formField">
-                <label for="id_b">B</label>
-                <input id="id_b" name="b" type="text" />
-            </div>
-            <div class="required c formField">
-                <label class="required" for="id_c">C</label>
-                <input id="id_c" name="c" required type="text" />
-            </div>
-            """
+        form.field_error('a', 'this is an error')
+
+        if DJANGO_VERSION >= (5, 0):  # Django 5.0 and later
+            test = """
+                <div class="required error a formField">
+                    <label class="required" for="id_a">A</label>
+                    <input aria-invalid="true" id="id_a" name="a" required type="text" />
+                    <ul class="errorlist"><li>this is an error message</li></ul>
+                </div>
+                <div class="b formField">
+                    <label for="id_b">B</label>
+                    <input id="id_b" name="b" type="text" />
+                </div>
+                <div class="required c formField">
+                    <label class="required" for="id_c">C</label>
+                    <input id="id_c" name="c" required type="text" />
+                </div>
+                """
+        else:
+            test = """
+                <div class="required error a formField">
+                    <label class="required" for="id_a">A</label>
+                    <input id="id_a" name="a" required type="text" />
+                    <ul class="errorlist"><li>this is an error message</li></ul>
+                </div>
+                <div class="b formField">
+                    <label for="id_b">B</label>
+                    <input id="id_b" name="b" type="text" />
+                </div>
+                <div class="required c formField">
+                    <label class="required" for="id_c">C</label>
+                    <input id="id_c" name="c" required type="text" />
+                </div>
+                """
 
         self.assertHTMLEqual(
             render_to_string('betterforms/form_as_fieldsets.html', env),
@@ -416,26 +434,48 @@ class TestFormRendering(TestCase):
             render_to_string('betterforms/form_as_fieldsets.html', env),
             test,
         )
-        form.field_error('a', 'this is an error message')
-        test = """
-            <fieldset class="formFieldset first">
-                <div class="required error a formField">
-                    <label class="required" for="id_a">A</label>
-                    <input id="id_a" name="a" required type="text" />
-                    <ul class="errorlist"><li>this is an error message</li></ul>
-                </div>
-                <div class="required b formField">
-                    <label class="required" for="id_b">B</label>
-                    <input id="id_b" name="b" required type="text" />
-                </div>
-            </fieldset>
-            <fieldset class="formFieldset second">
-                <div class="required c formField">
-                    <label class="required" for="id_c">C</label>
-                    <input id="id_c" name="c" required type="text" />
-                </div>
-            </fieldset>
-            """
+        form.field_error('a', 'this is an error')
+
+        if DJANGO_VERSION >= (5, 0):  # Django 5.0 and later
+            test = """
+                <fieldset class="formFieldset first">
+                    <div class="required error a formField">
+                        <label class="required" for="id_a">A</label>
+                        <input aria-invalid="true" id="id_a" name="a" required type="text" />
+                        <ul class="errorlist"><li>this is an error message</li></ul>
+                    </div>
+                    <div class="required b formField">
+                        <label class="required" for="id_b">B</label>
+                        <input id="id_b" name="b" required type="text" />
+                    </div>
+                </fieldset>
+                <fieldset class="formFieldset second">
+                    <div class="required c formField">
+                        <label class="required" for="id_c">C</label>
+                        <input id="id_c" name="c" required type="text" />
+                    </div>
+                </fieldset>
+                """
+        else:
+            test = """
+                <fieldset class="formFieldset first">
+                    <div class="required error a formField">
+                        <label class="required" for="id_a">A</label>
+                        <input id="id_a" name="a" required type="text" />
+                        <ul class="errorlist"><li>this is an error message</li></ul>
+                    </div>
+                    <div class="required b formField">
+                        <label class="required" for="id_b">B</label>
+                        <input id="id_b" name="b" required type="text" />
+                    </div>
+                </fieldset>
+                <fieldset class="formFieldset second">
+                    <div class="required c formField">
+                        <label class="required" for="id_c">C</label>
+                        <input id="id_c" name="c" required type="text" />
+                    </div>
+                </fieldset>
+                """
 
         self.assertHTMLEqual(
             render_to_string('betterforms/form_as_fieldsets.html', env),
@@ -512,27 +552,49 @@ class TestFormRendering(TestCase):
             test,
         )
 
-        form.field_error('a', 'this is an error')
-        test = """
-            <fieldset class="formFieldset first">
-                <p class="required error">
-                    <ul class="errorlist"><li>this is an error</li></ul>
-                    <label class="required" for="id_a">A</label>
-                    <input id="id_a" name="a" required type="text" />
-                </p>
-                <p class="required">
-                    <label class="required" for="id_b">B</label>
-                    <input id="id_b" name="b" required type="text" />
-                </p>
-            </fieldset>
-            <fieldset class="formFieldset second">
-                <p class="required">
-                    <label class="required" for="id_c">C</label>
-                    <input id="id_c" name="c" required type="text" />
-                </p>
-            </fieldset>
+        form.field_error("a", "this is an error message")
+
+        if DJANGO_VERSION >= (5, 0):  # Django 5.0 and later
+            test = """
+                <fieldset class="formFieldset first">
+                    <p class="required error">
+                        <ul class="errorlist"><li>this is an error</li></ul>
+                        <label class="required" for="id_a">A</label>
+                        <input id="id_a" name="a" required type="text" aria-invalid="true" />
+                    </p>
+                    <p class="required">
+                        <label class="required" for="id_b">B</label>
+                        <input id="id_b" name="b" required type="text" />
+                    </p>
+                </fieldset>
+                <fieldset class="formFieldset second">
+                    <p class="required">
+                        <label class="required" for="id_c">C</label>
+                        <input id="id_c" name="c" required type="text" />
+                    </p>
+                </fieldset>
             """
-        self.maxDiff=None
+        else:  # Django 4.2 and earlier
+            test = """
+                <fieldset class="formFieldset first">
+                    <p class="required error">
+                        <ul class="errorlist"><li>this is an error</li></ul>
+                        <label class="required" for="id_a">A</label>
+                        <input id="id_a" name="a" required type="text" />
+                    </p>
+                    <p class="required">
+                        <label class="required" for="id_b">B</label>
+                        <input id="id_b" name="b" required type="text" />
+                    </p>
+                </fieldset>
+                <fieldset class="formFieldset second">
+                    <p class="required">
+                        <label class="required" for="id_c">C</label>
+                        <input id="id_c" name="c" required type="text" />
+                    </p>
+                </fieldset>
+            """
+
 
         self.assertHTMLEqual(
             form.as_p(),
