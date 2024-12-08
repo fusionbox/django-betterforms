@@ -10,6 +10,7 @@ from django.db import models
 from django.test import TestCase
 from django.template.loader import render_to_string
 from django.http import QueryDict
+from django import VERSION as DJANGO_VERSION
 
 from betterforms.changelist import (
     BaseChangeListForm, SearchForm, SortForm, HeaderSet, Header, BoundHeader
