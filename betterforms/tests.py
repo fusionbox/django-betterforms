@@ -435,8 +435,7 @@ class TestFormRendering(TestCase):
             render_to_string('betterforms/form_as_fieldsets.html', env),
             test,
         )
-        form.field_error('a', 'this is an error')
-
+        form.field_error("a", "this is an error message")
         if DJANGO_VERSION >= (5, 0):  # Django 5.0 and later
             test = """
                 <fieldset class="formFieldset first">
@@ -553,7 +552,7 @@ class TestFormRendering(TestCase):
             test,
         )
 
-        form.field_error("a", "this is an error message")
+        form.field_error("a", "this is an error")
 
         if DJANGO_VERSION >= (5, 0):  # Django 5.0 and later
             test = """
