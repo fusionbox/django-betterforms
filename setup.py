@@ -21,7 +21,7 @@ setup(
     author_email='programmers@fusionbox.com',
     packages=[package for package in find_packages()
               if package.startswith('betterforms')],
-    install_requires=['Django>=1.11'],
+    install_requires=['Django>=4.2'],
     zip_safe=False,
     include_package_data=True,
     classifiers=[
@@ -31,12 +31,13 @@ setup(
         'License :: OSI Approved :: BSD License',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12',
+        'Programming Language :: Python :: 3.13',
+        'Programming Language :: Python :: 3.14',
         'Topic :: Internet :: WWW/HTTP',
     ],
 )

@@ -1,7 +1,10 @@
-2.0.1 (unreleased)
+3.0.0 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Dropped support for Python 3.5, 3.6, and 3.7.
+- Dropped support for Django 1.11, 2.0, 2.1, 2.2, 3.0, 3.1, 3.2, and 4.0.
+- Added support for Django 4.2, 5.0, 5.1, 5.2, and 6.0.
+- Added support for Python 3.11, 3.12, 3.13, and 3.14.
 
 
 2.0.0 (2022-08-11)

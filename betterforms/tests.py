@@ -367,8 +367,8 @@ class TestFormRendering(TestCase):
         test = """
             <div class="required error a formField">
                 <label class="required" for="id_a">A</label>
-                <input id="id_a" name="a" required type="text" />
-                <ul class="errorlist"><li>this is an error message</li></ul>
+                {field_a}
+                {errors_a}
             </div>
             <div class="b formField">
                 <label for="id_b">B</label>
@@ -378,7 +378,7 @@ class TestFormRendering(TestCase):
                 <label class="required" for="id_c">C</label>
                 <input id="id_c" name="c" required type="text" />
             </div>
-            """
+            """.format(field_a=form['a'], errors_a=form['a'].errors)
 
         self.assertHTMLEqual(
             render_to_string('betterforms/form_as_fieldsets.html', env),
@@ -421,8 +421,8 @@ class TestFormRendering(TestCase):
             <fieldset class="formFieldset first">
                 <div class="required error a formField">
                     <label class="required" for="id_a">A</label>
-                    <input id="id_a" name="a" required type="text" />
-                    <ul class="errorlist"><li>this is an error message</li></ul>
+                    {field_a}
+                    {errors_a}
                 </div>
                 <div class="required b formField">
                     <label class="required" for="id_b">B</label>
@@ -435,7 +435,7 @@ class TestFormRendering(TestCase):
                     <input id="id_c" name="c" required type="text" />
                 </div>
             </fieldset>
-            """
+            """.format(field_a=form['a'], errors_a=form['a'].errors)
 
         self.assertHTMLEqual(
             render_to_string('betterforms/form_as_fieldsets.html', env),
@@ -516,9 +516,9 @@ class TestFormRendering(TestCase):
         test = """
             <fieldset class="formFieldset first">
                 <p class="required error">
-                    <ul class="errorlist"><li>this is an error</li></ul>
+                    {errors_a}
                     <label class="required" for="id_a">A</label>
-                    <input id="id_a" name="a" required type="text" />
+                    {field_a}
                 </p>
                 <p class="required">
                     <label class="required" for="id_b">B</label>
@@ -531,7 +531,7 @@ class TestFormRendering(TestCase):
                     <input id="id_c" name="c" required type="text" />
                 </p>
             </fieldset>
-            """
+            """.format(field_a=form['a'], errors_a=form['a'].errors)
         self.maxDiff=None
 
         self.assertHTMLEqual(

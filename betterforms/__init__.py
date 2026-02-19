@@ -1,1 +1,3 @@
-__version__ = __import__('pkg_resources').get_distribution('django-betterforms').version
+from importlib.metadata import version
+
+__version__ = version('django-betterforms')
