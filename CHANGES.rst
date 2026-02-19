@@ -1,4 +1,4 @@
-3.0.0 (unreleased)
+3.0.0 (2026-02-19)
 ------------------
 
 - Dropped support for Python 3.5, 3.6, and 3.7.

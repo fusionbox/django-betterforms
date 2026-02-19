@@ -4,7 +4,7 @@ import os
 
 __doc__ = """App for Django featuring improved form base classes."""
 
-version = '2.0.1.dev0'
+version = '3.0.0'
 
 
 def read(fname):
