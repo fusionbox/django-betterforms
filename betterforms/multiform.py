@@ -1,6 +1,7 @@
 from itertools import chain
 from operator import add
 from collections import OrderedDict
+from contextlib import suppress
 
 from django.forms import BaseFormSet
 from django.forms.utils import ErrorList
@@ -56,7 +57,15 @@ class MultiForm:
         return self.as_table()
 
     def __getitem__(self, key):
-        return self.forms[key]
+        try:
+            # Return a form
+            return self.forms[key]
+        except KeyError:
+            # No form exists, try to return a field in the form
+            for _, form in self.forms.items():
+                with suppress(KeyError):
+                    return form[key]
+            raise
 
     @property
     def errors(self):
